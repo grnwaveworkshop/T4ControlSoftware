@@ -10,9 +10,9 @@ uint8_t DataPanelDoorState = 0;
 // structure of the servo move
 struct ServoSeq_t {
   uint8_t ServoNum; // Which servo to act on.
-  int pos;            // position of servo in degrees
-  int move_dur;       // duration of move (easing amount) in ms
-  int hold_time;      // ms to hold position
+  uint16_t pos;            // position of servo in degrees
+  uint16_t move_dur;       // duration of move (easing amount) in ms
+  uint16_t hold_time;      // ms to hold position
 };
 
 // structure to hold the status of the sequence
@@ -26,13 +26,17 @@ struct SeqStatus_t {
 };
 
 // define sequences
+// --------------------------------------
+// -------------  Gripper ---------------
+// --------------------------------------
 // Open Gripper arm and door
 ServoSeq_t GripOpen[] = {
-  {GRIPARMDOOR, 2500, 20, 250},
-  {GRIPARM, 2500, 220, 500},
-  {GRIPPER, 2500, 230, 320},
-  {GRIPPER, 100, 230, 320},
-  {GRIPPER, 2500, 230, 320},
+  {GRIPARMDOOR, GripArmDoorOpen, 20, 250},
+  {GRIPARM, GripArmOpen, 100, 500},
+  {GRIPPER, GripperOpen, 100, 150},
+  {GRIPPER, GripperClosed, 100, 150},
+  {GRIPPER, GripperOpen, 100, 150},
+  {GRIPPER, GripperClosed, 100, 0},
 
 };
 // num_moves, current_move, isActive, sequenceActivetime
@@ -40,46 +44,50 @@ SeqStatus_t GripStatOpen = {5, 0, 0, 0, millis()};
 
 // Close Gripper arm and door
 ServoSeq_t GripClose[] = {
-  {GRIPPER, 100, 280, 180},
-  {GRIPARM, 100, 220, 400},
-  {GRIPARMDOOR, 100, 20, 10},
+  {GRIPPER, GripperClosed, 280, 180},
+  {GRIPARM, GripArmClosed, 220, 500},
+  {GRIPARMDOOR, GripArmDoorClosed, 50, 10},
 };
 // num_moves, current_move, isActive, sequenceActivetime
 SeqStatus_t GripStatClose = {3, 0, 0, 0, millis()};
 
 // Open Gripper
-ServoSeq_t GripperOpen[] = {
+ServoSeq_t OpenGripper[] = {
 
-  {GRIPPER, 2500, 230, 125},
+  {GRIPPER, GripperOpen, 230, 125},
 
 };
 // num_moves, current_move, isActive, sequenceActivetime
 SeqStatus_t GripperStatOpen = {1, 0, 0, 0, millis()};
 
 // Close Gripper
-ServoSeq_t GripperClose[] = {
-  {GRIPPER, 100, 280, 180},
+ServoSeq_t CloseGripper[] = {
+  {GRIPPER, GripperClosed, 280, 180},
 };
 // num_moves, current_move, isActive, sequenceActivetime
 SeqStatus_t GripperStatClose = {1, 0, 0, 0, millis()};
 
+// ----------------------------------------------
+// -------------  Interface Arm  ---------------
+// ----------------------------------------------
+// 
 // Open Interface Arm and Door
-ServoSeq_t IntArmOpen[] = {
-  {INTARMDOOR, 2400, 20, 100},
-  {INTARM, 2400, 220, 100},
-  {INTERFACE, 2400, 50, 500},
-  {INTERFACE, 100, 50, 500},
-  {INTERFACE, 2400, 50, 500},
-  {INTERFACE, 100, 50, 500},
+ServoSeq_t OpenIntArm[] = {
+  {INTARMDOOR, IntArmdoorOpen, 20, 200},
+  {INTARM,    IntArmOpen, 220, 500},
+  {INTERFACE, InterfaceOpen, 50, 500},
+  {INTERFACE, InterfaceClosed, 50, 500},
+  {INTERFACE, InterfaceOpen, 50, 500},
+  {INTERFACE, InterfaceClosed, 50, 500},
 };
 // num_moves, current_move, isActive, sequenceActive time
 SeqStatus_t IntArmStatOpen = {6, 0, 0, 0, millis()};
 
 // Close Interface Arm and Door
-ServoSeq_t IntArmClose[] = {
-  {INTERFACE, 100, 50, 100},
-  {INTARM, 200, 220, 100},
-  {INTARMDOOR, 200, 20, 10},
+ServoSeq_t CloseIntArm[] = {
+  {INTERFACE, InterfaceClosed, 50, 180},
+  {INTARM, IntArmClosed, 220, 500},
+  {INTARMDOOR, IntArmdoorClosed, 20, 10},
 
 };
 // num_moves, current_move, isActive, sequenceActive time
@@ -87,26 +95,28 @@ SeqStatus_t IntArmStatClose = {3, 0, 0, 0, millis()};
 
 
 // Open Interface
-ServoSeq_t InterfaceOpen[] = {
+ServoSeq_t OpenInterface[] = {
 
-  {INTERFACE, 2500, 230, 125},
+  {INTERFACE, InterfaceOpen, 230, 125},
 
 };
 // num_moves, current_move, isActive, sequenceActive time
 SeqStatus_t InterfaceStatOpen = {1, 0, 0, 0, millis()};
 
 // Close Interface
-ServoSeq_t InterfaceClose[] = {
-  {INTERFACE, 100, 280, 180},
+ServoSeq_t CloseInterface[] = {
+  {INTERFACE, InterfaceClosed, 280, 180},
 };
 // num_moves, current_move, isActive, sequenceActive time
 SeqStatus_t InterfaceStatClose = {1, 0, 0, 0, millis()};
 
-//-----------------------
+// ----------------------------------------------
+// -------------  Data Panel Door ---------------
+// ----------------------------------------------
 // Data Panel Door Open
 ServoSeq_t DataDoorOpen[] = {
 
-  {DATAPPANELDOOR, 2500, 230, 125},
+  {DATAPPANELDOOR, DataPanelDoorOpen, 230, 125},
 
 };
 // num_moves, current_move, isActive, sequenceActive time
@@ -114,36 +124,39 @@ SeqStatus_t DataDoorStatOpen = {1, 0, 0, 0, millis()};
 
 // Close Interface
 ServoSeq_t DataDoorClose[] = {
-  {DATAPPANELDOOR, 100, 280, 180},
+  {DATAPPANELDOOR, DataPanelDoorClosed, 280, 180},
 };
 // num_moves, current_move, isActive, sequenceActive time
 SeqStatus_t DataDoorStatClose = {1, 0, 0, 0, millis()};
+bool bDataDoorOpen = 0;
 
 
-
+// ----------------------------------------------
+// ------------- Sequence Loop ------------------
+// ----------------------------------------------
 void SequenceLoop() {
 
   switch (IntArmState) {
     case 0:
       // do nothing until switch changes
-//Serial.println("in Int State 0");
+      //Serial.println("in Int State 0");
       if (ChannelData(IntArmSwitch) > 500) IntArmState = 1;
       break;
     case 1:
       // Run Open Sequence
-//      Serial.println("in Int State 1");
+      //      Serial.println("in Int State 1");
       IntArmStatOpen.isSeqActive = 1;
       IntArmState = 2;
       break;
     case 2:
       // Wait here till complete
-//      Serial.println("in Int State 2");
-      if (IntArmStatOpen.isSeqActive) PlaySequence(&IntArmStatOpen, IntArmOpen);
+      //      Serial.println("in Int State 2");
+      if (IntArmStatOpen.isSeqActive) PlaySequence(&IntArmStatOpen, OpenIntArm);
       else IntArmState = 3;
       break;
     case 3:
       // Wait until close sequence
-  //    Serial.println("in Int State 3");
+      //    Serial.println("in Int State 3");
       if (ChannelData(IntArmSwitch) < 500) IntArmState = 4;
       else if (ChannelData(IntArmSwitch) > 1200) {
         InterfaceStatOpen.isSeqActive = 1;
@@ -153,21 +166,21 @@ void SequenceLoop() {
       break;
     case 4:
       // Run Close Sequence
-//Serial.println("in Int State 4");
+      //Serial.println("in Int State 4");
       IntArmStatClose.isSeqActive = 1;
       IntArmState = 5;
       break;
     case 5:
       // Wait here till complete
-//Serial.println("in Int State 5");
-      if (IntArmStatClose.isSeqActive) PlaySequence(&IntArmStatClose, IntArmClose);
+      //Serial.println("in Int State 5");
+      if (IntArmStatClose.isSeqActive) PlaySequence(&IntArmStatClose, CloseIntArm);
       else IntArmState = 0;
       break;
 
     case 7:
       // Wait here till complete
-  //    Serial.println("in Int State 7");
-      if (InterfaceStatOpen.isSeqActive) PlaySequence(&InterfaceStatOpen, InterfaceOpen);
+      //    Serial.println("in Int State 7");
+      if (InterfaceStatOpen.isSeqActive) PlaySequence(&InterfaceStatOpen, OpenInterface);
       else  if (ChannelData(IntArmSwitch) < 1200) {
         InterfaceStatClose.isSeqActive = 1;
         IntArmState = 8;
@@ -176,8 +189,8 @@ void SequenceLoop() {
 
     case 8:
       // Wait here till complete
-  //    Serial.println("in Int State 8");
-      if (InterfaceStatClose.isSeqActive) PlaySequence(&InterfaceStatClose, InterfaceClose);
+      //    Serial.println("in Int State 8");
+      if (InterfaceStatClose.isSeqActive) PlaySequence(&InterfaceStatClose, CloseInterface);
       else if (ChannelData(IntArmSwitch) < 500) {
         InterfaceStatClose.isSeqActive = 1;
         IntArmState = 4;
@@ -247,7 +260,7 @@ void SequenceLoop() {
     case 7:
       // Wait here till complete
       //    Serial.println("in Grip State 7");
-      if (GripperStatOpen.isSeqActive) PlaySequence(&GripperStatOpen, GripperOpen);
+      if (GripperStatOpen.isSeqActive) PlaySequence(&GripperStatOpen, OpenGripper);
       else  if (ChannelData(GripArmSwitch) < 1200) {
         GripperStatClose.isSeqActive = 1;
         GripperState = 8;
@@ -257,7 +270,7 @@ void SequenceLoop() {
     case 8:
       // Wait here till complete
       //      Serial.println("in Grip State 8");
-      if (GripperStatClose.isSeqActive) PlaySequence(&GripperStatClose, GripperClose);
+      if (GripperStatClose.isSeqActive) PlaySequence(&GripperStatClose, CloseGripper);
       else if (ChannelData(GripArmSwitch) < 500) {
         GripStatClose.isSeqActive = 1;
         GripperState = 4;
@@ -274,16 +287,17 @@ void SequenceLoop() {
       break;
   }
 
-// Data Panel Door State Machine
+  // Data Panel Door State Machine
+#if 1 // Not Used! - Remapped to button
   switch (DataPanelDoorState) {
     case 0:
       //Serial.println("in Data Door 0");
       // do nothing until switch changes
-      if (ChannelData(DataPanelSwitch) > 500) DataPanelDoorState = 1;
+     // if (ChannelData(DataPanelSwitch) > 500) DataPanelDoorState = 1;
       break;
     case 1:
       // Run Open Sequence
-      //     Serial.println("in Data Door 1");
+           Serial.println("in Data Door 1");
       DataDoorStatOpen.isSeqActive = 1;
       DataPanelDoorState = 2;
       break;
@@ -302,13 +316,13 @@ void SequenceLoop() {
 
       // do nothing until switch changes
       // Close Arm or Open Gripper
-      if (ChannelData(DataPanelSwitch) < 500) DataPanelDoorState = 4;
-     
- 
+    //  if (ChannelData(DataPanelSwitch) < 500) DataPanelDoorState = 4;
+
+
       break;
     case 4:
       // Run Close Sequence
-      //   Serial.println("in Data Door 4");
+         Serial.println("in Data Door 4");
       DataDoorStatClose.isSeqActive = 1;
       DataPanelDoorState = 5;
       break;
@@ -320,11 +334,18 @@ void SequenceLoop() {
       if (DataDoorStatClose.isSeqActive) PlaySequence(&DataDoorStatClose, DataDoorClose);
       else DataPanelDoorState = 0;
       break;
+      default:
+      Serial.println("in Data Door default...");
+      break;
   }
+#endif  // Data Panel Door State Machine
 
   // Utility Arms
-  
+
 }
+// ----------- End Loop ----------------------
+
+
 
 
 void PlaySequence(struct SeqStatus_t *theSeqStatus, struct ServoSeq_t *moveList) {

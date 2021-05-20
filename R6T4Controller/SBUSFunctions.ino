@@ -31,6 +31,7 @@ void SBUSloop() {
     //    Serial.print(" ");
     // z++;
 
+// Turn on SBUS serial outputs
 #if 0
     for (int i = 0; i < 16; i++) {
       Serial.print("C");
@@ -47,8 +48,8 @@ void SBUSloop() {
 #endif
   }
   if (!failSafe && !lostFrame) {
-    for (int i = 0; i < 16; i++) { // check if any channels are zero, if so, toss the frame
-      if (channelsTemp[i] == 0) {
+    for (int i = 0; i < 16; i++) { // check if any channels are < 170, if so, toss the frame
+      if (channelsTemp[i] <= 170) {
         lostFrame = 1;
         if(SBUSokCount > 0) SBUSokCount--;
       }

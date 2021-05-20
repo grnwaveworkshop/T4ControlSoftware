@@ -3,7 +3,12 @@
 
 /*
 
- 
+  Teensy 4.1 controller
+  Servo Control
+  Audio Control
+  SBUS input
+  LED control
+  Display output
 
 */
 
@@ -17,26 +22,22 @@
 //#include <TeensyThreads.h>
 
 
-ST7789_t3 tft = ST7789_t3(TFT_CS,  TFT_DC, TFT_RST);
-
+//ST7789_t3 tft = ST7789_t3(TFT_CS,  TFT_DC, TFT_RST);
+ST7789_t3 tft = ST7789_t3(-1,  TFT_DC, TFT_RST);
 
 
 
 
 void setup()
 {
-
-
   Serial.begin(115200);
   Serial.println("Booting... ");
   DisplaySetup();
   LEDsetup();
-
   SBUSsetup();
   AudioSetup();
   ServoSetup();
-
-  tft.fillScreen(ST7735_BLACK);
+  Setup485();
 
   randomSeed(analogRead(0));
 
@@ -44,12 +45,12 @@ void setup()
 
 
 void loop() {
-//Serial.println("Hello World");
   SBUSloop();
   LEDloop();
   DisplayLoop();
   AudioLoop();
   ServoLoop();
+  ProcessEventsLoop();
   Serialloop();
 }
 

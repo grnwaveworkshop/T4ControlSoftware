@@ -6,7 +6,7 @@ unsigned long ServoCurrentMillis = millis();
 
 uint8_t ServoState = 0;
 
-
+// Define struct to contain the servo and parameters
 struct BodyServo {
   ServoEasing mServo;
   int min_usec;
@@ -17,6 +17,7 @@ struct BodyServo {
   bool isAttached;
 };
 
+// Define the Servo
 ServoEasing Dome;
 ServoEasing UtilityArmTop;
 ServoEasing UtilityArmBot;
@@ -30,18 +31,18 @@ ServoEasing DataPanel;
 
 
 
-// create servo objects
-// Servo , min_usec, max_usec, center_usec, current_position, target_position
-BodyServo ServoDome = { Dome , 1000 , 2000, 1500, 1500 , 1500, 0};
-BodyServo ServoUtilityArmTop = { UtilityArmTop , 1000 , 2000, 1500, 1500, 1500, 0 };
-BodyServo ServoUtilityArmBot = { UtilityArmBot , 1000 , 2000, 1500, 1500, 1500 , 0};
-BodyServo ServoIntArmDoor = { IntArmDoor , 1000 , 2000, 1500, 1500 , 1500, 0};
-BodyServo ServoIntArm = { IntArm , 1000 , 2000, 1500, 1500, 1500, 0};
-BodyServo ServoInterface = { Interface , 1000 , 2000, 1500, 1500, 1500, 0 };
-BodyServo ServoGripArmDoor = { GripArmDoor , 1000 , 2000, 1500, 1500, 1500, 0 };
-BodyServo ServoGripArm = { GripArm , 1000 , 1800, 1600, 1500, 1200 , 0};
-BodyServo ServoGrip = { Grip , 1200 , 1800, 1700, 1700, 1500, 0 };
-BodyServo ServoDataPanel = { DataPanel , 1000 , 2000, 1500, 1500, 1500, 0 };
+// create servo objects,  Set endpoints, center point here.
+//                                Servo ,  min_usec, max_usec, center_usec, current_position, target_position, isAttached
+BodyServo ServoDome =           { Dome ,          1000 , 2000, 1500, 1500, 1500, 0 };
+BodyServo ServoUtilityArmTop =  { UtilityArmTop , 750  , 2150, 2100, 2100, 2100, 0 };   // 2150 = closed
+BodyServo ServoUtilityArmBot =  { UtilityArmBot , 650  , 1950, 1950, 1950, 1950, 0 };   // 1950 = closed
+BodyServo ServoIntArmDoor =     { IntArmDoor ,    1250 , 1950, 1900, 1900, 1900, 0 };   // 1950 = closed
+BodyServo ServoIntArm =         { IntArm ,        830  , 2200, 830 , 830 , 830 , 0 };   // 830  = down
+BodyServo ServoInterface =      { Interface ,     800  , 2200, 800 , 800 , 800 , 0 };   // 800  = in
+BodyServo ServoGripArmDoor =    { GripArmDoor ,   1150 , 1850, 1150, 1200, 1200, 0 };   // 1150 = closed
+BodyServo ServoGripArm =        { GripArm ,       800  , 2075, 2075, 2075, 2075, 0 };   // 2075 = down
+BodyServo ServoGrip =           { Grip ,          1150 , 1500, 1450, 1450, 1450, 0 };   // 1500 = closed
+BodyServo ServoDataPanel =      { DataPanel ,     1125 , 1825, 1125, 1125, 1125, 0 };   // 1125 = closed
 
 BodyServo ServoList[] = {
   ServoDome,
@@ -75,24 +76,11 @@ int prevmillis = 0;
 
 
 void ServoSetup() {
-  // attach servos to pins
-  //  ServoDome.mServo.attach(DomePin);
-  //  ServoUtilityArmTop.mServo.attach(UtilityArmTopPin);
-  //  ServoUtilityArmBot.mServo.attach(UtilityArmBotPin);
-  //  ServoIntArmDoor.mServo.attach(IntArmDoorPin);
-  //  ServoIntArm.mServo.attach(IntArmPin);
-  //  ServoInterface.mServo.attach(InterfacePin);
-  //  ServoGripArmDoor.mServo.attach(GripArmDoorPin);
-  //  ServoGripArm.mServo.attach(GripArmPin);
-  //  ServoGrip.mServo.attach(GripPin);
-  //  ServoDataPanel.mServo.attach(DataPanelPin);
 
-  AttachAllServos();
+ AttachAllServos();
+
   ServoList[DOME].mServo.attach(DomePin);
-
-
   ServoList[DOME].mServo.writeMicroseconds(ServoDome.center_usec);
-
   ServoList[UTILITYARMTOP].mServo.setEasingType(EASE_CUBIC_IN_OUT);
   ServoList[UTILITYARMBOT].mServo.setEasingType(EASE_CUBIC_IN_OUT);
   ServoList[INTARM].mServo.setEasingType(EASE_CUBIC_IN_OUT);
@@ -103,37 +91,29 @@ void ServoSetup() {
 }
 
 void ServoLoop() {
-  if (millis() - prevmillis >= 20) {
+  // Process look if time expired
+  if (millis() - prevmillis >= 25) {
     //ServoPassthrough();
     //  DomeLoop();
 
-    switch (ServoState) {
+    if (ChannelData(ArmServosSwitch) < 1000) {
       // All Servos Off
-      case ServoPassThrough:
-        //       Serial.println("in servo passthrough state");
-        //ServoPassthrough();
-        DetachAll();
-        if (ChannelData(12) > 1000) {
-          ServoState = ServoSequences;
-          AttachAllServos();
-          HomeServos();
-        }
-        break;
 
-      case ServoSequences:
-        //        Serial.println("in sequence state");
-        SequenceLoop();
-        if (ChannelData(12) < 1000) ServoState = ServoPassThrough;
-        break;
-      default:
-        // statements
-        ServoState = ServoPassThrough;
-        break;
+      DetachAll();
+      // Serial.println(" Servos Off ");
     }
-    UpdateServos();
+    else {
+      //       Serial.println(" Servos On ");
+      AttachAllServos();
+      DomeLoop();
+      SequenceLoop();
+      UpdateServos();
+    }
     prevmillis = millis();
   }
 }
+
+
 void ServoPassthrough() {
   if (SBUSOK()) {
     AttachAllServos();
@@ -147,29 +127,19 @@ void ServoPassthrough() {
   }
   else {
     DetachAll();
-    //    Serial.println("sbus bad, setting to analog write 0");
-    //    analogWrite( UtilityArmTopPin, 0);
-    //    analogWrite( UtilityArmBotPin , 0);
-    //    analogWrite( IntArmDoorPin , 0);
-    //    analogWrite( IntArmPin , 0);
-    //    analogWrite( InterfacePin , 0);
-    //    analogWrite( GripArmDoorPin , 0);
-    //    analogWrite( GripArmPin , 0);
-    //    analogWrite( GripPin , 0);
-    //    analogWrite( DataPanelPin , 0);
-    //}
+
   }
 }
 
 void DomeLoop() {
-  float easing = 0.02;
+  float easing = 0.1;
   float Target;
   float dx;
 
   ServoCurrentMillis = millis();
   if (millis() - prevmillis >= 2) {
     if (SBUSOK()) {
-      Target = channels[3];
+      Target = channels[DomeChannel];
       // If crossing center, break at center first
       if ((ServoDome.current_position < SBUSCENTER - SBUSDEADBAND) && (Target >= SBUSCENTER)) {
         Target = SBUSCENTER;
@@ -178,28 +148,22 @@ void DomeLoop() {
         Target = SBUSCENTER;
       }
 
+     // Serial.print("Dome Target: ");
+     // Serial.println(Target);
+
       dx = Target - ServoDome.current_position;
       ServoDome.current_position += dx * easing;
-      //
-      //      Serial.print(channels[3]);
-      //      Serial.print(" ");
-      //      Serial.print(Target);
-      //      Serial.print(" ");
-      //      Serial.print(dx);
-      //      Serial.print(" ");
-      //      Serial.print(ServoDome.current_position);
-      //      Serial.print(" ");
-      //val = channels[3];                      // read SBUS channel 1
+
       if (ServoDome.current_position < SBUSCENTER) {
         val = map(ServoDome.current_position, SBUSMIN, SBUSCENTER, ServoDome.min_usec, ServoDome.center_usec);     // map SBUS to usec
       }
       else {
         val = map(ServoDome.current_position, SBUSCENTER, SBUSMAX, ServoDome.center_usec, ServoDome.max_usec);     // map SBUS to usec
       }
-      //      Serial.print(val);
-      //      Serial.println(" ");
+     
       ServoDome.mServo.writeMicroseconds(val);            // sets the servo position according to the scaled value
-
+      //Serial.print("Dome val: ");
+     // Serial.println(val);
     }
     else {
       Target = 988;
@@ -208,9 +172,7 @@ void DomeLoop() {
       ServoDome.current_position += dx * easing;
       val = map(ServoDome.current_position, 172, 1811, ServoDome.min_usec, ServoDome.max_usec);     // map SBUS to usec
       ServoDome.mServo.writeMicroseconds(val);            // if SBUS not ok, stop dome
-      //    Serial.println("SBUS FAIL: ");
-      //    Serial.print(ServoDome.center_usec);
-      //    Serial.println(" ");
+
     }
     prevmillis = millis();
   }
@@ -219,7 +181,7 @@ void DomeLoop() {
 void UpdateServos() {
 
   CheckLimits();
-  for (uint8_t x = 1; x < 9; x++) {
+  for (uint8_t x = 1; x <= 9; x++) {
     //    Serial.print(" t ");
     //    Serial.print(x);
     //    Serial.print(": ");
@@ -232,23 +194,25 @@ void UpdateServos() {
 }
 
 void CheckLimits() {
-  for (uint8_t x = 1; x < 9; x++) {
+  for (uint8_t x = 1; x <= 9; x++) {
     if (ServoList[x].target_position > ServoList[x].max_usec) ServoList[x].target_position = ServoList[x].max_usec ;
     if (ServoList[x].target_position < ServoList[x].min_usec) ServoList[x].target_position = ServoList[x].min_usec ;
   }
 }
 
 void HomeServos() {
-  for (uint8_t x = 1; x < 9; x++) {
+  for (uint8_t x = 1; x <= 9; x++) {
     ServoList[x].mServo.writeMicroseconds(ServoList[x].center_usec);
   }
 }
 
 
 void DetachAll() {
-  for (uint8_t x = 1; x < 9; x++) {
-    ServoList[x].mServo.detach();
-    ServoList[x].isAttached = 0;
+  for (uint8_t x = 1; x <= 9; x++) {
+    if (ServoList[x].isAttached == 1) {
+      ServoList[x].mServo.detach();
+      ServoList[x].isAttached = 0;
+    }
   }
 }
 
@@ -263,49 +227,34 @@ void AttachAllServos() {
   if (!ServoList[GRIPPER].isAttached) ServoList[GRIPPER].mServo.attach(GripPin);
   if (!ServoList[DATAPPANELDOOR].isAttached) ServoList[DATAPPANELDOOR].mServo.attach(DataPanelPin);
 
-  for (uint8_t x = 1; x < 9; x++) {
+  for (uint8_t x = 1; x <= 9; x++) {
 
     ServoList[x].isAttached = 1;
   }
 
 }
-// Utility Arm State Machine
-void UtilityArmLoop() {
 
-}
-
-bool OpenServo(int tServo) {
-
-}
 
 // Open top Utility Arm
-// return true when open
-bool OpenUtilityArmTop() {
-  if (ServoUtilityArmTop.mServo.readMicroseconds() < ServoUtilityArmTop.max_usec) {
-    ServoUtilityArmTop.mServo.writeMicroseconds(ServoUtilityArmTop.max_usec);
-    return false;
-  } else return true;
+void OpenUtilityArmTop() {
+  ServoList[UTILITYARMTOP].target_position = TopUtilityOpen;
 }
 
 // Close top Utility Arm
-// return true when closed
-bool CloseUtilityArmTop() {
-  ServoUtilityArmTop.mServo.writeMicroseconds(ServoUtilityArmTop.min_usec);
-  return false;
+void CloseUtilityArmTop() {
+  ServoList[UTILITYARMTOP].target_position = TopUtilityClosed;
 }
 
-// Open top Utility Arm
-// return true when open
-bool OpenUtilityArmBot() {
-  if (ServoUtilityArmTop.mServo.readMicroseconds() < ServoUtilityArmTop.max_usec) {
-    ServoUtilityArmTop.mServo.writeMicroseconds(ServoUtilityArmTop.max_usec);
-    return false;
-  } else return true;
+// Open Bottom Utility Arm
+void OpenUtilityArmBot() {
+
+  ServoList[UTILITYARMBOT].target_position = BotUtilityOpen;
+
 }
 
-// Close top Utility Arm
-// return true when closed
-bool CloseUtilityArmBot() {
-  ServoUtilityArmTop.mServo.writeMicroseconds(ServoUtilityArmTop.min_usec);
-  return false;
+// Close Bottom Utility Arm
+void CloseUtilityArmBot() {
+
+  ServoList[UTILITYARMBOT].target_position = BotUtilityClosed;
+
 }
