@@ -38,6 +38,7 @@ void setup()
   AudioSetup();
   ServoSetup();
   Setup485();
+  HelperSetup();
 
   randomSeed(analogRead(0));
 
@@ -52,13 +53,7 @@ void loop() {
   ServoLoop();
   ProcessEventsLoop();
   Serialloop();
+  ProcessHelpers();
 }
 
-float ReadInputVolts() {
-  // .235 divider  Vin = Vout/0.235
-  float Vin;
-  Vin = (analogRead(9) * (3.6 / 1023)) / .235;
 
-  return Vin;
-
-}

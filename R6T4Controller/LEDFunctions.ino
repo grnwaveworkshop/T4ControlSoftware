@@ -74,14 +74,21 @@ bool BankBLED_ON[numBankBLEDs];
 
 unsigned long LEDPrevMillis = millis();
 
+// flags to enable LEDs for sections
+bool CPLEDsON = 1;
+bool DPLEDsON = 1;
 
-int audiomax = 0;
-int audiomin = 1500;
-int audiomid = 500;
 
+
+
+extern uint16_t CurrentAudioVolume;
+
+// Charge Panel LED Variables
 const uint8_t numCPLEDs = 20;
-
 const uint8_t CPStartLED = 56;
+const uint8_t CPVLED1StartLED = 78; // Voltage display start LED 1 (Bottom)
+const uint8_t CPVLED2StartLED = 77;	// Voltage display start LED 2 (Middle)
+const uint8_t CPVLED3StartLED = 76;	// Voltage display start LED 1 (Top)
 
 unsigned long swap_CP[numCPLEDs];
 unsigned long prev_millisCP[numCPLEDs];
@@ -91,7 +98,7 @@ bool CPLED_ON[numCPLEDs];
 typedef void (*LEDSpectrumPatternList[])();
 LEDSpectrumPatternList gLEDSpectrumPatterns = { SpectrumBarsSBUS, KITTBarsAudio };
 
-uint8_t gCurrentLEDPatternNumber = 0; // Index number of which pattern is current
+uint8_t gCurrentLEDSpectrumNumber = 1; // Index number of which pattern is current
 
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
@@ -172,24 +179,26 @@ void LEDloop() {
 
 	if (millis() - LEDPrevMillis > 10) {
 
-		gLEDSpectrumPatterns[gCurrentLEDPatternNumber]();
+		gLEDSpectrumPatterns[gCurrentLEDSpectrumNumber]();
 		// SpectrumBarsSBUS(BLUE);
 		 //KITTBarsAudio(WHITE, RED);
 		twinkleBankA();
 		twinkleBankB(WHITE);
 		SBUSStatusLED();
 		twinkleCP(RED);
+		CPVoltLEDs();
 		LEDPrevMillis = millis();
+
 	}
 
 	if (!leds.busy()) leds.show();
 
 } // End Loop
 
-void nextLEDPattern()
+void nextLEDPatternDP()
 {
 	// add one to the current pattern number, and wrap around at the end
-	gCurrentLEDPatternNumber = (gCurrentLEDPatternNumber + 1) % ARRAY_SIZE(gLEDSpectrumPatterns);
+	gCurrentLEDSpectrumNumber = (gCurrentLEDSpectrumNumber + 1) % ARRAY_SIZE(gLEDSpectrumPatterns);
 }
 
 
@@ -199,43 +208,15 @@ void KITTBarsAudio()//uint32_t color, uint32_t color2)
 	int level1;
 	int level2;
 	int level3;
-	uint32_t color =  0x555555; // white
+	//	float level;
+	uint32_t color = 0x555555; // white
 	uint32_t color2 = 0x770000; // red
 
-	int audio = (analogRead(AUDIN));
-	//  Serial.println(audio);
-	if (audio >= audiomax) {
-		audiomax = audio;
-	}
-	if (audio <= audiomin) {
-		audiomin = audio;
-	}
-	int audiomid = 505;//(audiomax + audiomin) / 2;
+//	level = AudioLevel;
 
-	int level = 4 * abs(audio - audiomid);
-
-	level1 = map(level * .8, 0, audiomid, 0, 4);
-	level2 = map(level, 0, audiomid, 0, 4);
-	level3 = map(level * .8, 0, audiomid, 0, 4);
-
-	//    Serial.print(audio);
-	//    Serial.print(" ");
-	//    Serial.print(audiomin);
-	//    Serial.print(" ");
-	//
-	//    Serial.print(audiomid);
-	//    Serial.print(" ");
-	//    Serial.print(audiomax);
-	//     Serial.print(" ");
-	//    Serial.print(level1);
-	//       Serial.print(" ");
-	//    Serial.print(level2);
-	//       Serial.print(" ");
-	//    Serial.print(level3);
-	//    Serial.print(" ");
-	//    Serial.println(level);
-
-
+	level1 = AudioLevel - 1;	//map(level * .8, 0, audiomid, 0, 4);
+	level2 = AudioLevel;	//map(level, 0, audiomid, 0, 4);
+	level3 = AudioLevel - 1;	//map(level * .8, 0, audiomid, 0, 4);
 
 	//Clear bars
 	for (i = 0; i <= BarCEndLED; i++) {
@@ -353,77 +334,89 @@ void SpectrumBars(uint32_t color, int cycles, int wait)
 // BankA6 53(21) 54  55
 void twinkleBankA()
 {
-	// Singles
-	for (int i = 0; i <= numBankALEDs; i = i + 4) { // For each LED in strip...
-		if (millis() - prev_millisBankA[i] >= swap_intBankA[i]) {
-			if (BankALED_ON[i]) { // LED is on, so fade it off
-				//leds.setPixel(BankAStartLED + i, 0);
-				BankALED_ON[i] = 0;
-				prev_millisBankA[i] = millis();
-				swap_intBankA[i] = random(500, 2000);
+	// Check if need to turn all LEDs off
+	if (DPLEDsON) {
+		// Singles
+		for (int i = 0; i < numBankALEDs; i = i + 4) { // For each LED in strip...
+			if (millis() - prev_millisBankA[i] >= swap_intBankA[i]) {
+				if (BankALED_ON[i]) { // LED is on, so fade it off
+					//leds.setPixel(BankAStartLED + i, 0);
+					BankALED_ON[i] = 0;
+					prev_millisBankA[i] = millis();
+					swap_intBankA[i] = random(500, 2000);
+				}
+				else {// fade the LED on{
+					leds.setPixel(BankAStartLED + i, ColorArray[random(0, 3)]);
+					BankALED_ON[i] = 1;
+					prev_millisBankA[i] = millis();
+					swap_intBankA[i] = random(100, 2000);
+				}
 			}
-			else {// fade the LED on{
-				leds.setPixel(BankAStartLED + i, ColorArray[random(0, 3)]);
-				BankALED_ON[i] = 1;
-				prev_millisBankA[i] = millis();
-				swap_intBankA[i] = random(100, 2000);
+
+			// Check if need to fade LED
+			if (!BankALED_ON[i]) {
+				FadeLEDs(BankAStartLED + i, BankAStartLED + i, 10);
 			}
 		}
+		// Check each 'bar' and light up all three LEDs at once.
+		for (int y = 1; y < 20; y = y + 4) {
+			if (millis() - prev_millisBankA[y] >= swap_intBankA[y]) {
 
-		// Check if need to fade LED
-		if (!BankALED_ON[i]) {
-			FadeLEDs(BankAStartLED + i, BankAStartLED + i, 10);
+				if (BankALED_ON[y]) {
+					BankALED_ON[y] = 0;
+					prev_millisBankA[y] = millis();
+					swap_intBankA[y] = random(500, 2000);
+				}
+				else {
+					leds.setPixel(BankAStartLED + y, ColorArray[random(1, 5)]);
+					leds.setPixel(BankAStartLED + y + 1, leds.getPixel(BankAStartLED + y));
+					leds.setPixel(BankAStartLED + y + 2, leds.getPixel(BankAStartLED + y));
+
+					BankALED_ON[y] = 1;
+					prev_millisBankA[y] = millis();
+					swap_intBankA[y] = random(100, 2000);
+				}
+			}
+			if (!BankALED_ON[y]) {
+				FadeLEDs(BankAStartLED + y, BankAStartLED + y + 2, 10);
+			}
 		}
 	}
-	// Check each 'bar' and light up all three LEDs at once.
-	for (int y = 1; y <= 21; y = y + 4) {
-		if (millis() - prev_millisBankA[y] >= swap_intBankA[y]) {
-
-			if (BankALED_ON[y]) {
-				BankALED_ON[y] = 0;
-				prev_millisBankA[y] = millis();
-				swap_intBankA[y] = random(500, 2000);
-			}
-			else {
-				leds.setPixel(BankAStartLED + y, ColorArray[random(1, 5)]);
-				leds.setPixel(BankAStartLED + y + 1, leds.getPixel(BankAStartLED + y));
-				leds.setPixel(BankAStartLED + y + 2, leds.getPixel(BankAStartLED + y));
-
-				BankALED_ON[y] = 1;
-				prev_millisBankA[y] = millis();
-				swap_intBankA[y] = random(100, 2000);
-			}
-		}
-		if (!BankALED_ON[y]) {
-			FadeLEDs(BankAStartLED + y, BankAStartLED + y + 2, 10);
+	else {
+		for (int z = 0; z < numBankALEDs; z++) {
+			FadeLEDs(BankAStartLED + z, BankAStartLED + z, 10);
 		}
 	}
 }
 
 void twinkleBankB(uint32_t color)
 {
+	if (DPLEDsON) {
+		for (int i = 0; i < numBankBLEDs - 1; i++) { // For each LED in strip...
+			if (millis() - prev_millisBankB[i] >= swap_intBankB[i]) {
+				if (BankBLED_ON[i]) { //LED is on, so fade it off
+					//leds.setPixel(BankBStartLED + i, 0);
+					BankBLED_ON[i] = 0;
+					prev_millisBankB[i] = millis();
+					swap_intBankB[i] = random(100, 2000);
 
-	for (int i = 0; i < numBankBLEDs - 1; i++) { // For each LED in strip...
-		if (millis() - prev_millisBankB[i] >= swap_intBankB[i]) {
-			if (BankBLED_ON[i]) { //LED is on, so fade it off
-				//leds.setPixel(BankBStartLED + i, 0);
-				BankBLED_ON[i] = 0;
-				prev_millisBankB[i] = millis();
-				swap_intBankB[i] = random(100, 2000);
+				}
+				else {    // turn the LED off
+					leds.setPixel(BankBStartLED + i, ColorArray[random(0, 4)]);
+					BankBLED_ON[i] = 1;
+					prev_millisBankB[i] = millis();
+					swap_intBankB[i] = random(500, 2000);
 
+				}
 			}
-			else {    // turn the LED off
-				leds.setPixel(BankBStartLED + i, ColorArray[random(0, 4)]);
-				BankBLED_ON[i] = 1;
-				prev_millisBankB[i] = millis();
-				swap_intBankB[i] = random(500, 2000);
-
-
-
+			if (!BankBLED_ON[i]) {
+				FadeLEDs(BankBStartLED + i, BankBStartLED + i, 1);
 			}
 		}
-		if (!BankBLED_ON[i]) {
-			FadeLEDs(BankBStartLED + i, BankBStartLED + i, 10);
+	}
+	else {
+		for (int z = 0; z < numBankBLEDs; z++) {
+			FadeLEDs(BankBStartLED + z, BankBStartLED + z, 10);
 		}
 	}
 }
@@ -476,27 +469,54 @@ void SBUSStatusLED()
 
 void twinkleCP(uint32_t color)
 {
-	//FadeLEDs(CPStartLED, CPStartLED + numCPLEDs, 1);
-	for (int i = 0; i < numCPLEDs; i++) { // For each LED in panel...
-		if (millis() - prev_millisCP[i] >= swap_CP[i]) { // timer expired, do something
-			if (CPLED_ON[i]) { // LED is on, so fade it off
-				//leds.setPixel(CPStartLED + i, 0);
-				CPLED_ON[i] = 0;
-				prev_millisCP[i] = millis();
-				swap_CP[i] = random(100, 2000);
-			}
-			else {
-				leds.setPixel(CPStartLED + i, color);
-				CPLED_ON[i] = 1;
-				prev_millisCP[i] = millis();
-				swap_CP[i] = random(500, 2000);
+	if (CPLEDsON) {
+		//FadeLEDs(CPStartLED, CPStartLED + numCPLEDs, 1);
+		for (uint8_t i = 0; i < numCPLEDs; i++) { // For each LED in panel...
+			if (millis() - prev_millisCP[i] >= swap_CP[i]) { // timer expired, do something
+				if (CPLED_ON[i]) { // LED is on, so fade it off
+					//leds.setPixel(CPStartLED + i, 0);
+					CPLED_ON[i] = 0;
+					prev_millisCP[i] = millis();
+					swap_CP[i] = random(100, 2000);
+				}
+				else {
+					leds.setPixel(CPStartLED + i, color);
+					CPLED_ON[i] = 1;
+					prev_millisCP[i] = millis();
+					swap_CP[i] = random(500, 2000);
 
+				}
 			}
-		}
-		if (!CPLED_ON[i]) {
-			FadeLEDs(CPStartLED + i, CPStartLED + i, 1);
+			if (!CPLED_ON[i]) {
+				FadeLEDs(CPStartLED + i, CPStartLED + i, 1);
+			}
 		}
 	}
+	else {
+		for (uint8_t z = 0; z < numCPLEDs; z++)
+			FadeLEDs(CPStartLED + z, CPStartLED + z, 1);
+	}
+}
+
+void CPVoltLEDs() {
+	float BattVolts = ReadInputVolts();
+
+	if (BattVolts < 12.3) {
+		leds.setPixel(CPVLED1StartLED, 0x180000);
+		leds.setPixel(CPVLED2StartLED, 0);
+		leds.setPixel(CPVLED3StartLED, 0);
+	}
+	if (BattVolts >= 12.3 && BattVolts < 12.8) {
+		leds.setPixel(CPVLED1StartLED, 0x180000);
+		leds.setPixel(CPVLED2StartLED, 0x161600);
+		leds.setPixel(CPVLED3StartLED, 0);
+	}
+	if (BattVolts >= 12.8) {
+		leds.setPixel(CPVLED1StartLED, 0x180000);
+		leds.setPixel(CPVLED2StartLED, 0x161600);
+		leds.setPixel(CPVLED3StartLED, 0x002000);
+	}
+
 }
 
 // Function to Fade LEDs specified by amount
@@ -519,4 +539,22 @@ void FadeLEDs(uint8_t StartLED, uint8_t StopLED, uint16_t FadeAmount) {
 
 		leds.setPixel(StartLED + i, r, g, b);
 	}
+}
+
+void TurnCPLEDsOff() {
+	CPLEDsON = false;
+}
+
+void TurnCPLEDsOn() {
+	CPLEDsON = true;
+}
+
+void TurnDPLEDsOff() {
+	DPLEDsON = false;
+	digitalWrite(TFT_BLK, LOW);
+}
+
+void TurnDPLEDsOn() {
+	DPLEDsON = true;
+	digitalWrite(TFT_BLK, HIGH);
 }

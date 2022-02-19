@@ -39,8 +39,8 @@ void DisplaySetup(void)
 	tft.useFrameBuffer(true);
 	tft.println("Booting. . .");
 	tft.updateScreen();
-	tft.enableScroll();
-	tft.setScrollTextArea(00, 100, 240, 140);
+	//	tft.enableScroll();
+	//	tft.setScrollTextArea(125, 40, 115, 200);
 
 	tft.updateScreen();
 	tft.setTextSize(2);
@@ -50,25 +50,50 @@ void DisplaySetup(void)
 
 	if (!SD.begin(SD_CS)) {
 		tft.fillScreen(ST7735_BLACK);
-		tft.setCursor(5, tft.height() / 2 - 6);
+		//	tft.setCursor(5, tft.height() / 2 - 6);
 		tft.print("Unable to access");
-		tft.setCursor(32, tft.height() / 2 + 6);
-		tft.print("SD card");
+		//	tft.setCursor(32, tft.height() / 2 + 6);
+		tft.println("SD card");
 		tft.updateScreen();
 	}
-	tft.fillScreen(ST7735_BLACK);
-	//bmpDraw("cat.bmp", 0, 0);
+	else {
+		//	tft.setCursor(5, tft.height() / 2 - 6);
+		tft.println("SD Access OK...");
+		tft.updateScreen();
+	}
+	//tft.fillScreen(ST7735_BLACK);
+	bmpDraw("R6O120WB.bmp", 0, 0);
+
+	//bmpDraw("R6240WB.bmp",0,0);
+	// 	   bmpDraw("R6_120.bmp",0,0);
 	//delay(2000);
+	tft.setCursor(70, 0);
+
+	///*	tft.enableScroll();
+	//	t*/ft.setScrollTextArea(0, 00, 115, 100);
+
+	tft.setTextColor(ST7735_RED);
+	tft.setTextSize(3);
+	tft.println("R6-T28");
+	tft.updateScreen();
+	//tft.setScrollTextArea(125, 40, 115, 160);
+
+	tft.setCursor(125, 40);
+	tft.updateScreen();
+	tft.setTextSize(2);
+	tft.setTextColor(ST7735_WHITE, ST7735_BLACK);
 }
 
 void pre(void)
 {
 	tft.fillScreen(ST7735_BLACK);
-	tft.setCursor(0, 0);
+	bmpDraw("R6240WB.bmp", 0, 0);
+	tft.setCursor(200, 0);
 	tft.setTextColor(ST7735_RED);
 	tft.setTextSize(3);
-	tft.print("    R6-T28   ");
-	tft.setCursor(0, 30);
+	tft.print("R6-T28");
+	tft.setCursor(125, 40);
+
 }
 
 
@@ -77,37 +102,45 @@ void DisplayLoop(void)
 {
 
 
-	tft.setTextWrap(true);
+	//tft.setTextWrap(true);
 
-	if (millis() - DisplayPrevMillis > 250) {
+	if (millis() - DisplayPrevMillis > 1200) {
 		// delay(1500);
 		//Serial.println("Display Loop");
 		//    tft.setCursor(0, 75);
 
-		pre();
-		tft.setTextColor(ST7735_WHITE);
-		//    tft.setTextSize(3);
-		//   tft.println("Hello World!");
-		tft.setTextSize(2);
+	//	pre();
+		//if (isDataPanelOpen()) {
+			tft.setTextColor(ST7735_WHITE, ST7735_BLACK);
+			//    tft.setTextSize(3);
+			//   tft.println("Hello World!");
+			tft.setTextSize(2);
 
-		tft.setCursor(150, 200);
-		tft.print("RT:");
-		tft.setTextColor(ST7735_MAGENTA);
-		tft.print(millis() / 1000);
-		tft.setTextColor(ST7735_WHITE);
-		tft.println("s");
-		tft.setCursor(150, 220);
-		tft.print(ReadInputVolts(), 2);
-		// Serial.println(ReadInputVolts(), 2);
-		tft.println(" V");
-		tft.setCursor(10, 220);
-		//tft.print(analogRead(8));
-		//tft.println(" A8");
-		//  tft.setScrollTextArea(50,00, 240, 160);
-		DisplayAudioStatus();
-		DisplayPrevMillis = millis();
-		tft.updateScreen();
-
+			tft.setCursor(150, 200);
+			tft.print("RT:");
+			tft.setTextColor(ST7735_MAGENTA, ST7735_BLACK);
+			tft.print(millis() / 1000);
+			tft.setTextColor(ST7735_WHITE, ST7735_BLACK);
+			tft.println("s");
+			tft.setCursor(150, 220);
+			tft.setTextColor(ST7735_BLUE, ST7735_BLACK);
+			tft.print(ReadInputVolts(), 2);
+			// Serial.println(ReadInputVolts(), 2);
+			tft.println(" V");
+			tft.setCursor(125, 40);
+			//tft.print(analogRead(8));
+			//tft.println(" A8");
+			//  tft.setScrollTextArea(50,00, 240, 160);
+			//tft.setScrollTextArea(125, 40, 115, 159);
+			tft.setTextColor(ST7735_WHITE, ST7735_BLACK);
+			DisplayAudioStatus();
+			DisplayPrevMillis = millis();
+			tft.updateScreen();
+		//}
+		//else {
+		//	tft.fillScreen(ST7735_BLACK);
+		//	tft.updateScreen();
+		//}
 	}
 
 }
