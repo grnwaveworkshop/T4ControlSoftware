@@ -23,7 +23,7 @@
 #define AUDIOSWITCH 15
 #define AUDIOFOLDER 14
 
-#define NUMAUDIOFOLDERS 20
+#define NUMAUDIOFOLDERS 12
 
 // -------- Define Colors ----------
 //#define RED    0xFF0000
@@ -61,8 +61,12 @@
 // Analog Input Definitions
 #define AUDIN 7
 
+// Servo Time out.  Time to wait to detach servos. 
+#define SERVOTIMEOUT 35
+
+
 // Servo Endpoint Definitions
-#define TopUtilityClosed 2150
+#define TopUtilityClosed 2300
 #define TopUtilityOpen 750
 #define BotUtilityClosed 1950
 #define BotUtilityOpen 550
@@ -113,14 +117,16 @@
 
 // Radio Switch Channel Definitions = Radio channel - 1
 // Set to the Radio channel desired for each switch function
-#define ButtonSwitch 3
-#define ArmServosSwitch 4
-#define IntArmSwitch 5
-#define GripArmSwitch 6
-#define DataPanelSwitch 9
-#define UtilityArmTopSwitch 10
-#define UtilityArmBotSwitch 11
-#define AudioVolume 10
+#define BUTTONSWITCH 3	// 16 button channel
+#define SERVOENSWITCH 4	//	Switch used to enable the body servos
+#define INTARMSWITCH 5		// Switch used to control the Interface Arm
+#define GRIPARMSWITCH 6		// Switch used to control the gripper arm
+//#define DataPanelSwitch 9
+//#define UtilityArmTopSwitch 10
+//#define UtilityArmBotSwitch 11
+#define DRIVEENABLE 7	// Switch that activates the Dome and drive motors
+#define AUDIOVOLUME 10	// Audio volume control
+#define BUTTONBANK 9	// Switch to change the bank of buttom functions
 
 // Servo output pin mapping
 #define DomePin 24            // Servo 1
@@ -156,4 +162,4 @@
 #define CButtonD4 1676
 
 #define ButtonDeadband 5
-#define LongPressCount 15
+#define LongPressCount 8

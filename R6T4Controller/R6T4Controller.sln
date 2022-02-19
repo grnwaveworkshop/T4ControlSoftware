@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31205.134
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "R6T4Controller", "R6T4Controller.vcxproj", "{03BB5764-C227-4B52-9207-91411A16AB9D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PiePanel6Servo", "..\..\..\PiePanelServo\Software\PiePanel6Servo\PiePanel6Servo.vcxproj", "{C5F80730-F44F-4478-BDAE-6634EFC2CA88}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PSIHD", "..\..\..\PSI\Software\PSIHD\PSIHD.vcxproj", "{BEA0D55A-542C-438D-B5FA-96595391CD6C}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "R6Logic", "..\..\..\R6DomeLogic LEDs\Software\R6Logic\R6Logic.vcxproj", "{43C1FEB2-C237-468F-8EE3-2538BC35D0A5}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HoloNeo2Servo", "..\..\..\Holo\Software\HoloNeo2Servo\HoloNeo2Servo.vcxproj", "{F2D58817-8AAD-41BC-87CA-7D25E3DA4873}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Smoke485Nano", "..\..\..\SmokeController\Software\Smoke485Nano\Smoke485Nano.vcxproj", "{D3B62AD6-8DE7-4019-8EB5-5C4339038452}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{03BB5764-C227-4B52-9207-91411A16AB9D}.Debug|x86.ActiveCfg = Debug|Win32
+		{03BB5764-C227-4B52-9207-91411A16AB9D}.Debug|x86.Build.0 = Debug|Win32
+		{03BB5764-C227-4B52-9207-91411A16AB9D}.Release|x86.ActiveCfg = Release|Win32
+		{03BB5764-C227-4B52-9207-91411A16AB9D}.Release|x86.Build.0 = Release|Win32
+		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Debug|x86.ActiveCfg = Debug|Win32
+		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Debug|x86.Build.0 = Debug|Win32
+		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Release|x86.ActiveCfg = Release|Win32
+		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Release|x86.Build.0 = Release|Win32
+		{BEA0D55A-542C-438D-B5FA-96595391CD6C}.Debug|x86.ActiveCfg = Debug|Win32
+		{BEA0D55A-542C-438D-B5FA-96595391CD6C}.Debug|x86.Build.0 = Debug|Win32
+		{BEA0D55A-542C-438D-B5FA-96595391CD6C}.Release|x86.ActiveCfg = Release|Win32
+		{BEA0D55A-542C-438D-B5FA-96595391CD6C}.Release|x86.Build.0 = Release|Win32
+		{43C1FEB2-C237-468F-8EE3-2538BC35D0A5}.Debug|x86.ActiveCfg = Debug|Win32
+		{43C1FEB2-C237-468F-8EE3-2538BC35D0A5}.Debug|x86.Build.0 = Debug|Win32
+		{43C1FEB2-C237-468F-8EE3-2538BC35D0A5}.Release|x86.ActiveCfg = Release|Win32
+		{43C1FEB2-C237-468F-8EE3-2538BC35D0A5}.Release|x86.Build.0 = Release|Win32
+		{F2D58817-8AAD-41BC-87CA-7D25E3DA4873}.Debug|x86.ActiveCfg = Debug|Win32
+		{F2D58817-8AAD-41BC-87CA-7D25E3DA4873}.Debug|x86.Build.0 = Debug|Win32
+		{F2D58817-8AAD-41BC-87CA-7D25E3DA4873}.Release|x86.ActiveCfg = Release|Win32
+		{F2D58817-8AAD-41BC-87CA-7D25E3DA4873}.Release|x86.Build.0 = Release|Win32
+		{D3B62AD6-8DE7-4019-8EB5-5C4339038452}.Debug|x86.ActiveCfg = Debug|Win32
+		{D3B62AD6-8DE7-4019-8EB5-5C4339038452}.Debug|x86.Build.0 = Debug|Win32
+		{D3B62AD6-8DE7-4019-8EB5-5C4339038452}.Release|x86.ActiveCfg = Release|Win32
+		{D3B62AD6-8DE7-4019-8EB5-5C4339038452}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FF01D321-8C59-442B-A206-637161ACA61E}
+	EndGlobalSection
+EndGlobal
