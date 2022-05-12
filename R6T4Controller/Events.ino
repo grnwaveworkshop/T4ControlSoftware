@@ -1,18 +1,20 @@
 // Radio Event triggering
 // Mapping radio switches etc. to functions.
-
+//  Requires Scheduler Library.  Modified Library by TZ
 
 #include "definitions.h"
 #include <Scheduler.h>
 
 uint8_t RunMode = 0;
 uint16_t ButtonState = 0;
-bool ButtonPressed = false;
+bool ButtonPressed = false;	// Button Pressed indicator for button bank
+bool ButtonPressedTR = false;	// Button Pressed indicator for Trim Rud
 bool ButtonLongPressed = false;
 bool TetrisMode = false;
 
 
-int ButtonCount = 0;
+int ButtonCount = 0;	// Counter for Button Bank
+int ButtonCountTR = 0;	// Counter for Trim Rud
 
 extern bool bDataDoorOpen;
 extern bool bUtilityOpen;
@@ -62,6 +64,7 @@ void CheckLongPress(void (*func)(), bool continuous) {
 
 // Function to determine which button was pressed and run the function associated with the click
 void ProcessButtons() {
+	// Check button bank presses
 	switch (GetButtonState()) {
 		case (ButtonOff - ButtonDeadband) ... (ButtonOff + ButtonDeadband) :
 			ButtonPressed = 0;
@@ -112,6 +115,7 @@ void ProcessButtons() {
 					break;
 				case (CButtonD1 - ButtonDeadband) ... (CButtonD1 + ButtonDeadband) :
 					CheckButtonPress(ButtonD1Click, ButtonD1ClickB);
+					CheckLongPress(ButtonD1LongClick, 0);
 					break;
 				case (CButtonD2 - ButtonDeadband) ... (CButtonD2 + ButtonDeadband) :
 					CheckButtonPress(ButtonD2Click, ButtonD2ClickB);
@@ -127,6 +131,13 @@ void ProcessButtons() {
 				default:
 					break;
 	}
+
+	// Check Trim Rud Button
+	if (ChannelData(CDCHANNEL) > 1200) {
+		ButtonCountTR++;
+		if (ButtonCountTR > LongPressCount-4) DispenseCard();
+	}
+	else ButtonCountTR = 0;
 }
 
 
@@ -144,6 +155,7 @@ void ButtonA1LongClick() {
 	AllDomeLEDsOff();
 	TurnDPLEDsOff();
 	TurnCPLEDsOff();
+	TurnDPortLEDsOff();
 
 }
 
@@ -173,7 +185,8 @@ void ButtonA3Click() {
 }
 
 void ButtonA3ClickB() {
-
+	CurrentTrack = 2;
+	DFPlayer.playFolder(1, CurrentTrack);
 }
 
 void ButtonA4Click() {
@@ -214,6 +227,8 @@ void ButtonB3Click() {
 
 void ButtonB3ClickB() {
 	PieCloseSequencial();
+	CurrentTrack = 16;
+	DFPlayer.playFolder(1, CurrentTrack);
 }
 
 void ButtonB4Click() {
@@ -252,6 +267,7 @@ void ButtonB4ClickB() {
 	CurrentTrack = random(1, NumTracksFolder[12]);
 	DFPlayer.playFolder(12, CurrentTrack);
 	SetPSIMode(2); // PSI Short Circuit
+	SetDPortLEDMode(2);
 	scheduler.schedule(HolosBright, 40);
 	scheduler.schedule(LogicShortCircuit, 40);
 	scheduler.schedule(PieOpen0, random(10, 1500));
@@ -276,12 +292,13 @@ void ButtonB4ClickB() {
 
 	scheduler.schedule(TurnCPLEDsOff, 5000);
 	scheduler.schedule(TurnDPLEDsOff, 6000);
+	scheduler.schedule(TurnDPortLEDsOff, 3500);
 	scheduler.schedule(AllDomeLEDsOff, 6000);
 	scheduler.schedule(ServosAllClosed, 6020);;
 	scheduler.schedule(AllDomeLEDsOff, 6040);
 	scheduler.schedule(AllDomeLEDsOff, 6080);
 
-	scheduler.schedule(AllDomeLEDsOn, 8000);
+	scheduler.schedule(AllDomeLEDsOn, 12000);
 
 }
 
@@ -331,7 +348,8 @@ void ButtonC3Click() {
 }
 
 void ButtonC3ClickB() {
-
+	CurrentTrack = 5;
+	DFPlayer.playFolder(1, CurrentTrack);
 }
 
 void ButtonC4Click() {
@@ -363,11 +381,17 @@ void ButtonD1Click() {
 			TurnDPLEDsOn();
 			TurnCPLEDsOn();
 			AllDomeLEDsOn();
+			TurnDPLEDsOn();
+			TurnDPortLEDsOn();
 		}
 	}
 }
 void ButtonD1ClickB() {
 	SetPSIMode(6);  //Radar
+}
+
+void ButtonD1LongClick() {
+	TurnDPortLEDsOff();
 }
 
 void ButtonD2Click() {

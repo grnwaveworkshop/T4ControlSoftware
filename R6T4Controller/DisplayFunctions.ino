@@ -3,9 +3,11 @@
   DisplayFunctions.ino
 
   Functions for controlling the display
+  Requires:
+  ST7789_t3 Library - part of Teensyduino
 
 */
-#include <Adafruit_GFX.h>    // Core graphics library
+//#include <Adafruit_GFX.h>    // Core graphics library
 #include <ST7789_t3.h> // Hardware-specific library
 #include <SPI.h>
 #include <SD.h>

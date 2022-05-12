@@ -66,10 +66,10 @@
 
 
 // Servo Endpoint Definitions
-#define TopUtilityClosed 2300
-#define TopUtilityOpen 750
-#define BotUtilityClosed 1950
-#define BotUtilityOpen 550
+#define TopUtilityClosed 2200
+#define TopUtilityOpen 1000
+#define BotUtilityClosed 2200
+#define BotUtilityOpen 850
 
 #define IntArmdoorClosed 1950
 #define IntArmdoorOpen 1250 
@@ -127,6 +127,7 @@
 #define DRIVEENABLE 7	// Switch that activates the Dome and drive motors
 #define AUDIOVOLUME 10	// Audio volume control
 #define BUTTONBANK 9	// Switch to change the bank of buttom functions
+#define CDCHANNEL 11	// Switch to activate the card dispenser
 
 // Servo output pin mapping
 #define DomePin 24            // Servo 1
@@ -140,6 +141,11 @@
 #define GripPin 32            // Servo 9
 #define DataPanelPin 33       // Servo 10
 //#define DataPanelPin 36          // Servo 11
+
+// Card Dispenser Definitions
+#define DIRPIN	10	// Direction pin for translator
+#define CARDDISPENSER	1	// Card dispenser motor driver on D1
+#define CARDONTIME	1400	// on time to dispense a card.
 
 // Switch Matrix button center points SBUS Values
 // 4x4 Switch Matrix

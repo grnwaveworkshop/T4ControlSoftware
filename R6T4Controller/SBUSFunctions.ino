@@ -1,3 +1,7 @@
+// SBUS related functions and controls
+// Requires SBUS library - https://github.com/bolderflight/SBUS
+// Library modified to allow for invert for Teensy 4.
+
 
 #include "SBUS.h"
 #include "definitions.h"
