@@ -5,8 +5,8 @@
 
 // Audio Defines
 // Audio States
-#define AudioIdle 0
-#define AudioPlaying 1
+#define AUDIOMANUAL 0
+#define AUDIOAUTO 1
 
 // SBUS defines
 #define SBUSCENTER 988
@@ -128,6 +128,7 @@
 #define AUDIOVOLUME 10	// Audio volume control
 #define BUTTONBANK 9	// Switch to change the bank of buttom functions
 #define CDCHANNEL 11	// Switch to activate the card dispenser
+#define AUDIOMODE  8	// Switch to activate Auto Sounds and Dome
 
 // Servo output pin mapping
 #define DomePin 24            // Servo 1
