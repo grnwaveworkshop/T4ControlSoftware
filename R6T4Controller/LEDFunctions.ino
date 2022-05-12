@@ -3,6 +3,7 @@
   LED Banks:
   Data Panel: 56 LEDs
   Charge Panel: 23 LEDs
+  Data Port: 
 
   http://www.pjrc.com/teensy/td_libs_OctoWS2811.html
 	DataPanel: LEDBankA: pin 40 pixels 0-55
@@ -34,8 +35,8 @@
 #include "definitions.h"
 
 // Any group of digital pins may be used
-const uint8_t numPins = 2;
-byte pinList[numPins] = { 40, 39 };  // DataPanel, Charge Port
+const uint8_t numPins = 3;
+byte pinList[numPins] = { 40, 39, 38 };  // DataPanel, Charge Port, Data Port
 
 const uint8_t ledsPerStrip = 56;  // DataPanel max 56 LEDs
 
@@ -77,9 +78,7 @@ unsigned long LEDPrevMillis = millis();
 // flags to enable LEDs for sections
 bool CPLEDsON = 1;
 bool DPLEDsON = 1;
-
-
-
+bool DPortLEDsON = 1;
 
 extern uint16_t CurrentAudioVolume;
 
@@ -94,11 +93,23 @@ unsigned long swap_CP[numCPLEDs];
 unsigned long prev_millisCP[numCPLEDs];
 bool CPLED_ON[numCPLEDs];
 
+const uint8_t numDPortLEDs = 33;
+const uint8_t DPortStartLED = 112;  // Data Port String Start LED
+byte DPortIndex = 0;
+byte DPortKRUp = 1;
+unsigned long DPPortLEDMillis = millis();
+
 // List of patterns to cycle through.  Each is defined as a separate function below.
 typedef void (*LEDSpectrumPatternList[])();
 LEDSpectrumPatternList gLEDSpectrumPatterns = { SpectrumBarsSBUS, KITTBarsAudio };
 
 uint8_t gCurrentLEDSpectrumNumber = 1; // Index number of which pattern is current
+
+// List of Data Port patterns to cycle through. 
+typedef void (*LEDDataPortPatternList[])();
+LEDSpectrumPatternList gLEDDataPortPatterns = { DPortOff, DPortKnightRiderRED , DPortShortCircuit, DPortCard };
+
+uint8_t gCurrentLEDDPortNumber = 1; // Index number of which pattern is current
 
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
@@ -153,7 +164,13 @@ void LEDsetup() {
 		delay(10);
 	}
 
+	for (int i = DPortStartLED; i <= DPortStartLED + numDPortLEDs; i++) {
+		leds.setPixel(i, ORANGE);
+		leds.show();
+		delay(250);
+	}
 #endif
+
 
 	// Seed variable intervals
 	for (int i = 0; i < numBankALEDs; i++) { // For each LED in strip...
@@ -177,9 +194,10 @@ void LEDsetup() {
 
 void LEDloop() {
 
-	if (millis() - LEDPrevMillis > 10) {
+	if (millis() - LEDPrevMillis > 15) {
 
 		gLEDSpectrumPatterns[gCurrentLEDSpectrumNumber]();
+		gLEDDataPortPatterns[gCurrentLEDDPortNumber]();
 		// SpectrumBarsSBUS(BLUE);
 		 //KITTBarsAudio(WHITE, RED);
 		twinkleBankA();
@@ -187,6 +205,7 @@ void LEDloop() {
 		SBUSStatusLED();
 		twinkleCP(RED);
 		CPVoltLEDs();
+		
 		LEDPrevMillis = millis();
 
 	}
@@ -200,7 +219,6 @@ void nextLEDPatternDP()
 	// add one to the current pattern number, and wrap around at the end
 	gCurrentLEDSpectrumNumber = (gCurrentLEDSpectrumNumber + 1) % ARRAY_SIZE(gLEDSpectrumPatterns);
 }
-
 
 void KITTBarsAudio()//uint32_t color, uint32_t color2)
 {
@@ -541,6 +559,121 @@ void FadeLEDs(uint8_t StartLED, uint8_t StopLED, uint16_t FadeAmount) {
 	}
 }
 
+void DPortOff() {
+	FadeLEDs(DPortStartLED, DPortStartLED + numDPortLEDs, 25);
+	DPortLEDsON = 0;
+}
+
+void DPortKnightRiderRED() {
+	DPortKnightRider(0xFF0000, 0, 10);
+}
+
+void DPortKnightRider(uint32_t colorfg, uint32_t colorbg, uint16_t wait)
+{
+	/*Serial.print(DPortKRUp);
+	Serial.print(" i: ");
+	Serial.println(DPortIndex);*/
+		if (DPortKRUp) {
+			if (DPortKRUp > 1) {
+				DPortKRUp--;
+			}
+			else {
+				if ((millis() - DPPortLEDMillis) > wait) {
+					if (DPortIndex > 0) {
+						DPortIndex--;
+						leds.setPixel(DPortStartLED + DPortIndex, colorfg);
+					//	leds.setPixel(DPortStartLED + DPortIndex + 1, colorbg);
+					}
+					else {
+						DPortKRUp = 0;
+						
+					}
+					DPPortLEDMillis = millis();
+					//Serial.println(DPPortLEDMillis);
+				}
+			}
+		}
+		else {
+			if ((millis() - DPPortLEDMillis) > (wait)) {
+				if (DPortIndex < numDPortLEDs - 1) {
+					DPortIndex++;
+					leds.setPixel(DPortStartLED + DPortIndex, colorfg);
+				//	leds.setPixel(DPortStartLED + DPortIndex - 1, colorbg);
+				}
+				else {
+					DPortKRUp = 60;
+				//	leds.setPixel(DPortStartLED + DPortIndex, colorbg);
+
+				}
+				DPPortLEDMillis = millis();
+			}
+
+		}
+	
+	FadeLEDs(DPortStartLED, DPortStartLED + numDPortLEDs , 25);
+}
+
+void DPortShortCircuit() {
+	byte pixnum;
+	byte i;
+	if (millis() - DPPortLEDMillis > DPortIndex) {
+		// Select a random number of pixels for color 1
+		pixnum = random(1, 2);
+		for (i = 0; i < pixnum; i++) {
+			leds.setPixel(DPortStartLED + random(0, numDPortLEDs - 1), 0xCCCCCC);
+		}
+
+		// Select a random number of pixels for color 2
+		pixnum = random(1, 2);
+		for (i = 0; i < pixnum; i++) {
+			leds.setPixel(DPortStartLED + random(0, numDPortLEDs - 1), 0x0000CC);
+		}
+
+		pixnum = random(1, 2);
+		for (i = 0; i < pixnum; i++) {
+			leds.setPixel(DPortStartLED + random(0, numDPortLEDs - 1), 0xCC0000);
+		}
+		DPortIndex = DPortIndex + 2;
+		FadeLEDs(DPortStartLED, DPortStartLED + numDPortLEDs - 1, 80);
+		DPPortLEDMillis = millis();
+	}
+}
+
+void StartDPortCardLED() {
+	DPortIndex = 0;
+	gCurrentLEDDPortNumber = 3;
+	DPortKRUp = 0;
+	DPPortLEDMillis = millis();
+}
+
+void DPortCard() {
+	if ((millis() - DPPortLEDMillis) > 25) {
+		if (DPortIndex < 10) {
+			leds.setPixel(DPortStartLED + DPortIndex, 0xFF0000);
+			leds.setPixel(DPortStartLED + numDPortLEDs - DPortIndex, 0xFF0000);
+			//	DPortIndex++;
+			//	DPortKRUp++;
+		}
+
+		if (DPortIndex < 25) {
+
+			DPortIndex++;
+		}
+		else
+		{
+			for (byte x = 12; x < numDPortLEDs - 12; x++) {
+				leds.setPixel(DPortStartLED + x, 0xFFFFFFF);
+			}
+			DPortIndex = 0;
+
+		}
+		if (DPortKRUp < 220) DPortKRUp++;
+		else gCurrentLEDDPortNumber = 0;
+		FadeLEDs(DPortStartLED, DPortStartLED + numDPortLEDs, 15);
+		DPPortLEDMillis = millis();
+	}
+}
+
 void TurnCPLEDsOff() {
 	CPLEDsON = false;
 }
@@ -557,4 +690,18 @@ void TurnDPLEDsOff() {
 void TurnDPLEDsOn() {
 	DPLEDsON = true;
 	digitalWrite(TFT_BLK, HIGH);
+}
+
+void TurnDPortLEDsOff() {
+	DPortLEDsON = false;
+	gCurrentLEDDPortNumber = 0;
+}
+
+void TurnDPortLEDsOn() {
+	DPortLEDsON = true;
+	gCurrentLEDDPortNumber = 1;
+}
+
+void SetDPortLEDMode(byte mode) {
+	gCurrentLEDDPortNumber = mode;
 }

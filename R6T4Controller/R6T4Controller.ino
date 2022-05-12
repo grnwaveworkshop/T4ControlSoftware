@@ -14,7 +14,7 @@
 
 #include <OctoWS2811.h>
 #include <Arduino.h>
-#include <Adafruit_GFX.h>
+//#include <Adafruit_GFX.h>
 #include <ST7789_t3.h>
 #include "definitions.h"
 

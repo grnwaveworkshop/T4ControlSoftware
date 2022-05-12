@@ -1,4 +1,5 @@
 //#include <DFPlayerMini_Fast.h>
+// Requires DFRobotDFPlayerMini Library https://github.com/DFRobot/DFRobotDFPlayerMini
 #include "DFRobotDFPlayerMini.h"
 #include "definitions.h"
 

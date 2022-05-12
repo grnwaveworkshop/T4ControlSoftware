@@ -1,6 +1,8 @@
-
+// Servo Control Functions and Processes
+// Requires ServoEasing Library - https://github.com/ArminJo/ServoEasing
+// Requires the servo library from Teensyduino
 //#include <Servo.h>
-#include "ServoEasing.h"
+#include "ServoEasing.hpp"
 
 unsigned long ServoCurrentMillis = millis();
 
@@ -34,8 +36,8 @@ ServoEasing DataPanel;
 // create servo objects,  Set endpoints, center point here.
 //                                Servo ,  min_usec, max_usec, center_usec, current_position, target_position, isAttached
 BodyServo ServoDome = { Dome ,          1000 , 2000, 1500, 1500, 1500, 0 };
-BodyServo ServoUtilityArmTop = { UtilityArmTop , 750  , TopUtilityClosed, 2100, 2100, 2100, 0 };   // 2150 = closed
-BodyServo ServoUtilityArmBot = { UtilityArmBot , 650  , 1950, 1950, 1950, 1950, 0 };   // 1950 = closed
+BodyServo ServoUtilityArmTop = { UtilityArmTop , TopUtilityOpen  , TopUtilityClosed, TopUtilityClosed, TopUtilityClosed, TopUtilityClosed, 0 };   // 2150 = closed
+BodyServo ServoUtilityArmBot = { UtilityArmBot , BotUtilityOpen  , BotUtilityClosed, BotUtilityClosed, BotUtilityClosed, BotUtilityClosed, 0 };   // 1950 = closed
 BodyServo ServoIntArmDoor = { IntArmDoor ,    1250 , 1950, 1900, 1900, 1900, 0 };   // 1950 = closed
 BodyServo ServoIntArm = { IntArm ,        830  , 2200, 830 , 830 , 830 , 0 };   // 830  = down
 BodyServo ServoInterface = { Interface ,     800  , 2200, 800 , 800 , 800 , 0 };   // 800  = in
