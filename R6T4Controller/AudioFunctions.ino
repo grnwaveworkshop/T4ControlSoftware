@@ -9,7 +9,10 @@
 DFRobotDFPlayerMini DFPlayer;
 
 
-//int AudioState = 0;
+uint8_t AudioState = AUDIOMANUAL;
+unsigned long AudioAutoMillis = millis();
+unsigned long AudioAutoWait = 3000;
+
 //int SwitchState = 0;
 //char PrevAudioState = 0;
 
@@ -20,6 +23,8 @@ uint8_t NumTracksFolder[NUMAUDIOFOLDERS + 1];
 uint16_t CurrentAudioVolume = 10;
 unsigned long AudioPrevMillis = millis();
 unsigned long AudioPlayTime = millis();
+
+const uint8_t AutoAudioFolderList[5] = { 2, 5, 6, 8, 9 };
 
 int audiomax = 0;
 int audiomin = 1500;
@@ -86,7 +91,21 @@ void AudioLoop() {
 
 		//  AudioPrevMillis = millis();
 		SampleAudio();
+
+		// Auto Mode Audio
+		if (ChannelData(AUDIOMODE) > 500) {
+			if (millis() - AudioAutoMillis  > AudioAutoWait) {
+				uint8_t RandomFolder = AutoAudioFolderList[random(0, 4)];
+				CurrentTrack = random(1, NumTracksFolder[RandomFolder]);
+				DFPlayer.playFolder(RandomFolder, CurrentTrack);
+				AudioAutoMillis = millis();
+				AudioAutoWait = random(3500, 15000);
+			}
+
+		}
 	}
+
+
 }
 
 void IncVolume() {
