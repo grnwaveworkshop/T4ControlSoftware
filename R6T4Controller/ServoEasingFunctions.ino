@@ -144,47 +144,55 @@ void ServoPassthrough() {
 }
 
 void DomeLoop() {
-	float easing = 0.1;
+//	float easing = 0.1;
 	float Target;
-	float dx;
+//	float dx;
 
 	ServoCurrentMillis = millis();
 	if (millis() - prevmillis >= 2) {
 		if (SBUSOK()) {
-			Target = channels[DomeChannel];
-			// If crossing center, break at center first
-			if ((ServoDome.current_position < SBUSCENTER - SBUSDEADBAND) && (Target >= SBUSCENTER)) {
-				Target = SBUSCENTER;
+		//	Target = channels[DomeChannel];
+		//	// If crossing center, break at center first
+		//	if ((ServoDome.current_position < SBUSCENTER - SBUSDEADBAND) && (Target >= SBUSCENTER)) {
+		//		Target = SBUSCENTER;
+		//	}
+		//	if ((ServoDome.current_position > SBUSCENTER + SBUSDEADBAND) && (Target <= SBUSCENTER)) {
+		//		Target = SBUSCENTER;
+		//	}
+
+		//	// Serial.print("Dome Target: ");
+		//	// Serial.println(Target);
+
+		//	dx = Target - ServoDome.current_position;
+		//	ServoDome.current_position += dx * easing;
+
+		//	if (ServoDome.current_position < SBUSCENTER) {
+		//		val = map(ServoDome.current_position, SBUSMIN, SBUSCENTER, ServoDome.min_usec, ServoDome.center_usec);     // map SBUS to usec
+		//	}
+		//	else {
+		//		val = map(ServoDome.current_position, SBUSCENTER, SBUSMAX, ServoDome.center_usec, ServoDome.max_usec);     // map SBUS to usec
+		//	}
+
+		//	ServoDome.mServo.writeMicroseconds(val);            // sets the servo position according to the scaled value
+		//	//Serial.print("Dome val: ");
+		//   // Serial.println(val);
+		//}
+		//else {
+		//	Target = 988;
+		//	easing = 0.1;
+		//	dx = Target - ServoDome.current_position;
+		//	ServoDome.current_position += dx * easing;
+		//	val = map(ServoDome.current_position, 172, 1811, ServoDome.min_usec, ServoDome.max_usec);     // map SBUS to usec
+		//	ServoDome.mServo.writeMicroseconds(val);            // if SBUS not ok, stop dome
+			if (ChannelData(AUDIOMODE) > 500) {
+				Target = abs(ServoDome.current_position - channels[DomeChannel]);
+				Serial.print("Dome Target");
+				Serial.println(Target);
+				if (Target >= 20) {
+					PlayMuse();
+					ServoDome.current_position = channels[DomeChannel];
+				}
 			}
-			if ((ServoDome.current_position > SBUSCENTER + SBUSDEADBAND) && (Target <= SBUSCENTER)) {
-				Target = SBUSCENTER;
-			}
-
-			// Serial.print("Dome Target: ");
-			// Serial.println(Target);
-
-			dx = Target - ServoDome.current_position;
-			ServoDome.current_position += dx * easing;
-
-			if (ServoDome.current_position < SBUSCENTER) {
-				val = map(ServoDome.current_position, SBUSMIN, SBUSCENTER, ServoDome.min_usec, ServoDome.center_usec);     // map SBUS to usec
-			}
-			else {
-				val = map(ServoDome.current_position, SBUSCENTER, SBUSMAX, ServoDome.center_usec, ServoDome.max_usec);     // map SBUS to usec
-			}
-
-			ServoDome.mServo.writeMicroseconds(val);            // sets the servo position according to the scaled value
-			//Serial.print("Dome val: ");
-		   // Serial.println(val);
-		}
-		else {
-			Target = 988;
-			easing = 0.1;
-			dx = Target - ServoDome.current_position;
-			ServoDome.current_position += dx * easing;
-			val = map(ServoDome.current_position, 172, 1811, ServoDome.min_usec, ServoDome.max_usec);     // map SBUS to usec
-			ServoDome.mServo.writeMicroseconds(val);            // if SBUS not ok, stop dome
-
 		}
 		prevmillis = millis();
 	}

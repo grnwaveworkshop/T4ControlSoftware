@@ -108,7 +108,7 @@ void DisplayLoop(void)
 
 	if (millis() - DisplayPrevMillis > 1200) {
 		// delay(1500);
-		//Serial.println("Display Loop");
+		// Serial.println("Display Loop");
 		//    tft.setCursor(0, 75);
 
 	//	pre();

@@ -15,19 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="R6T4Controller.ino" />
-    <None Include="AudioFunctions.ino" />
-    <None Include="ChargePanelLED.ino" />
-    <None Include="DisplayFunctions.ino" />
-    <None Include="Events.ino" />
-    <None Include="LEDFunctions.ino" />
-    <None Include="SBUSFunctions.ino" />
-    <None Include="Serial485.ino" />
-    <None Include="ServoEasingFunctions.ino" />
-    <None Include="ServoSequences.ino" />
-    <None Include="HelperFunctions.ino" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="__vm\.R6T4Controller.vsarduino.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -37,5 +24,19 @@
     <ClInclude Include="ServoSequences.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="AudioFunctions.ino" />
+    <ClCompile Include="AudioVocalizer.ino" />
+    <ClCompile Include="ChargePanelLED.ino" />
+    <ClCompile Include="DisplayFunctions.ino" />
+    <ClCompile Include="Events.ino" />
+    <ClCompile Include="HelperFunctions.ino" />
+    <ClCompile Include="LEDFunctions.ino" />
+    <ClCompile Include="R6T4Controller.ino" />
+    <ClCompile Include="SBUSFunctions.ino" />
+    <ClCompile Include="Serial485.ino" />
+    <ClCompile Include="ServoEasingFunctions.ino" />
+    <ClCompile Include="ServoSequences.ino" />
   </ItemGroup>
 </Project>

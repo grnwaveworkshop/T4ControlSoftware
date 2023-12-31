@@ -28,7 +28,9 @@ const uint8_t AutoAudioFolderList[5] = { 2, 5, 6, 8, 9 };
 
 int audiomax = 0;
 int audiomin = 1500;
-int audiomid = 505;
+int audiomid = 505;	// DFPlayer
+//int audiomid = 18;	// Vocalizer
+
 
 uint16_t AudioLevel = 0;
 
@@ -45,7 +47,7 @@ void AudioSetup() {
 
 	Serial.print("Current Volume: ");
 	Serial.println(CurrentAudioVolume);
-	delay(2000);
+	//delay(2000);
 	//DisplayPrint("DFPlayer Version: ",10,100);
 	//  tft.print("DFPlayer Version: ");
 	//  tft.println(DFPlayer.currentVersion());
@@ -70,7 +72,7 @@ void AudioSetup() {
 	Serial.println("start folder query");
 
 	//Disable folder scan
-#if 1
+#if 0
 	for (uint8_t y = 1; y <= NUMAUDIOFOLDERS; y++) {
 		NumTracksFolder[y] = DFPlayer.readFileCountsInFolder(y);
 		// tft.println( NumTracksFolder[y]);
@@ -87,17 +89,17 @@ void AudioSetup() {
 
 void AudioLoop() {
 	// Audio Processing Loop
-	if ((millis() - AudioPrevMillis) > 5) {
+	if ((millis() - AudioPrevMillis) > 25) {
 
 		//  AudioPrevMillis = millis();
-		SampleAudio();
+		//SampleAudio();
 
 		// Auto Mode Audio
 		if (ChannelData(AUDIOMODE) > 500) {
 			if (millis() - AudioAutoMillis  > AudioAutoWait) {
-				uint8_t RandomFolder = AutoAudioFolderList[random(0, 4)];
-				CurrentTrack = random(1, NumTracksFolder[RandomFolder]);
-				DFPlayer.playFolder(RandomFolder, CurrentTrack);
+				//uint8_t RandomFolder = AutoAudioFolderList[random(0, 4)];
+				//CurrentTrack = random(1, NumTracksFolder[RandomFolder]);
+				//DFPlayer.playFolder(RandomFolder, CurrentTrack);
 				AudioAutoMillis = millis();
 				AudioAutoWait = random(3500, 15000);
 			}
@@ -139,18 +141,23 @@ uint8_t GetAudioFolder() {
 
 float SampleAudio() {
 	int audio = (analogRead(AUDIN));
-	//  Serial.println(audio);
+	  //Serial.print(audio);
 	if (audio > audiomax) {
 		audiomax = audio;
 	}
-	// decay audio max back to midpoint
-	if (audiomax > audiomid) audiomax--;
+	//// decay audio max back to midpoint
+	//if (audiomax > audiomid) audiomax--;
 
 	if (audio < audiomin) {
 		audiomin = audio;
 	}
-	// decay audio min back to mid point
-	if (audiomin < audiomid) audiomin++;
+
+	//Serial.print(" min: ");
+	//Serial.print(audiomin);
+	//Serial.print(" max: ");
+	//Serial.print(audiomax);
+	//// decay audio min back to mid point
+	//if (audiomin < audiomid) audiomin++;
 
 
 	//int audiomid = 505;//(audiomax + audiomin) / 2;
@@ -159,9 +166,17 @@ float SampleAudio() {
 	/*Serial.printf("audiomax: %d",audiomax);
 	Serial.printf("level: %d", level);
 	Serial.println("");*/
-	float level = (-0.35 * CurrentAudioVolume + 10.7) * abs(audio - audiomid);
-	AudioLevel = map(level, 0, audiomid, 0, 4);
-
+	//float level = (-0.35 * CurrentAudioVolume + 10.7) * abs(audio - audiomid); // DFPlayer
+	  float level = audio - 17;
+	  if (level > 5) {
+		  AudioLevel = level / 10; // map(level, 0, audiomax - 17, 0, 4);
+	  }
+	  else {
+		  AudioLevel = 0;
+	  }
+	  //Serial.print(" L: ");
+	  //Serial.println(AudioLevel);
+	 
 	return level;
 }
 
@@ -179,7 +194,7 @@ void PlayTrackorAdvert(uint8_t Folder, uint8_t Track, uint8_t AdvertStart, uint8
 	if (state != 513) {
 		
 		if (!Track) {
-			CurrentTrack = random(1, NumTracksFolder[Folder]);
+			//CurrentTrack = random(1, NumTracksFolder[Folder]);
 			Serial.print("play track ");
 			Serial.println(CurrentTrack);
 		}
@@ -188,8 +203,8 @@ void PlayTrackorAdvert(uint8_t Folder, uint8_t Track, uint8_t AdvertStart, uint8
 			Serial.print("play track ");
 			Serial.println(CurrentTrack);
 		}
-		DFPlayer.playFolder(Folder, CurrentTrack);
-		DFPlayer.playFolder(Folder, CurrentTrack);
+		//DFPlayer.playFolder(Folder, CurrentTrack);
+		//DFPlayer.playFolder(Folder, CurrentTrack);
 	}
 	else {
 	

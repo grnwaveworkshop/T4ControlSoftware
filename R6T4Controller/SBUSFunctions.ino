@@ -36,7 +36,7 @@ void SBUSloop() {
     // z++;
 
 // Turn on SBUS serial outputs
-#if 0
+#if 1
     for (int i = 0; i < 16; i++) {
       Serial.print("C");
       Serial.print(i);

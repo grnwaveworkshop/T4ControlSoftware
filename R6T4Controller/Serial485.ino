@@ -26,6 +26,7 @@ PSIPatternList gPSIPatterns = {
   PSIRedBlueSwirl,	// 5
   PSIRadar,			// 6
   PSIHeart,			// 7
+  PSISiren,			// 8
 };
 byte PSIMode = 1;		// Index to the PSI Pattern List  
 
@@ -317,6 +318,15 @@ void PSIHeart() {
 	PSIMode = 7;
 }
 
+void PSISiren() {
+	mysenddata.address = PSIFRONTADDRESS;
+	mysenddata.command = 'T';
+	mysenddata.Data1 = 10;
+
+	DataOut.sendData();
+	PSIMode = 8;
+}
+
 	void PSIConfetti() {
 		mysenddata.address = PSIFRONTADDRESS;
 		mysenddata.command = 'T';
@@ -441,6 +451,8 @@ void PieCloseSequencial() {
 // Close all the Pie Servos sequencially
 void PieOpenClose3(uint16_t NumCycles) {
 	Serial.println("Pie Servo Open Close 3");
+//	PieSetServoSpeed(400);
+
 	mysenddata.address = PIESERVOADDRESS;
 	mysenddata.command = 'T';
 	mysenddata.Data1 = 6;
@@ -517,4 +529,24 @@ void PieClose4() {
 
 void PieClose5() {
 	PieCloseSingle(5);
+}
+
+// Start Bubbles
+void StartBubbles() {
+	Serial.println("Start Bubbles");
+	mysenddata.address = PIESERVOADDRESS;
+	mysenddata.command = 'T';
+	mysenddata.Data1 = 7;
+
+	DataOut.sendData();
+}
+
+// Stop Bubbles
+void StopBubbles() {
+	Serial.println("Stop Bubbles");
+	mysenddata.address = PIESERVOADDRESS;
+	mysenddata.command = 'T';
+	mysenddata.Data1 = 8;
+
+	DataOut.sendData();
 }

@@ -1,5 +1,4 @@
-#include <SD.h>
-#include <SD_t3.h>
+
 
 /*
 
@@ -17,6 +16,8 @@
 //#include <Adafruit_GFX.h>
 #include <ST7789_t3.h>
 #include "definitions.h"
+#include <SD.h>
+//#include <SD_t3.h>
 
 //#include <Wire.h>
 //#include <TeensyThreads.h>
@@ -35,11 +36,12 @@ void setup()
   DisplaySetup();
   LEDsetup();
   SBUSsetup();
-  AudioSetup();
+  //AudioSetup();
+  VocalizerSetup();
   ServoSetup();
   Setup485();
   HelperSetup();
-
+  Serial.println("Setup Complete... ");
   randomSeed(analogRead(0));
 
 }
@@ -49,11 +51,12 @@ void loop() {
   SBUSloop();
   LEDloop();
   DisplayLoop();
-  AudioLoop();
+ // AudioLoop();
+  VocalizerAudioLoop();
   ServoLoop();
   ProcessEventsLoop();
   Serialloop();
-  ProcessHelpers();
+ ProcessHelpers();
 }
 
 

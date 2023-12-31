@@ -95,8 +95,8 @@ bool CPLED_ON[numCPLEDs];
 
 const uint8_t numDPortLEDs = 33;
 const uint8_t DPortStartLED = 112;  // Data Port String Start LED
-byte DPortIndex = 0;
-byte DPortKRUp = 1;
+byte gDPortIndex = 0;
+byte gDPortKRUp = 1;
 unsigned long DPPortLEDMillis = millis();
 
 // List of patterns to cycle through.  Each is defined as a separate function below.
@@ -107,7 +107,7 @@ uint8_t gCurrentLEDSpectrumNumber = 1; // Index number of which pattern is curre
 
 // List of Data Port patterns to cycle through. 
 typedef void (*LEDDataPortPatternList[])();
-LEDSpectrumPatternList gLEDDataPortPatterns = { DPortOff, DPortKnightRiderRED , DPortShortCircuit, DPortCard };
+LEDSpectrumPatternList gLEDDataPortPatterns = { DPortOff, DPortKnightRiderRED , DPortShortCircuit, DPortCard, DPortSiren };
 
 uint8_t gCurrentLEDDPortNumber = 1; // Index number of which pattern is current
 
@@ -573,19 +573,19 @@ void DPortKnightRider(uint32_t colorfg, uint32_t colorbg, uint16_t wait)
 	/*Serial.print(DPortKRUp);
 	Serial.print(" i: ");
 	Serial.println(DPortIndex);*/
-		if (DPortKRUp) {
-			if (DPortKRUp > 1) {
-				DPortKRUp--;
+		if (gDPortKRUp) {
+			if (gDPortKRUp > 1) {
+				gDPortKRUp--;
 			}
 			else {
 				if ((millis() - DPPortLEDMillis) > wait) {
-					if (DPortIndex > 0) {
-						DPortIndex--;
-						leds.setPixel(DPortStartLED + DPortIndex, colorfg);
+					if (gDPortIndex > 0) {
+						gDPortIndex--;
+						leds.setPixel(DPortStartLED + gDPortIndex, colorfg);
 					//	leds.setPixel(DPortStartLED + DPortIndex + 1, colorbg);
 					}
 					else {
-						DPortKRUp = 0;
+						gDPortKRUp = 0;
 						
 					}
 					DPPortLEDMillis = millis();
@@ -595,19 +595,18 @@ void DPortKnightRider(uint32_t colorfg, uint32_t colorbg, uint16_t wait)
 		}
 		else {
 			if ((millis() - DPPortLEDMillis) > (wait)) {
-				if (DPortIndex < numDPortLEDs - 1) {
-					DPortIndex++;
-					leds.setPixel(DPortStartLED + DPortIndex, colorfg);
+				if (gDPortIndex < numDPortLEDs - 1) {
+					gDPortIndex++;
+					leds.setPixel(DPortStartLED + gDPortIndex, colorfg);
 				//	leds.setPixel(DPortStartLED + DPortIndex - 1, colorbg);
 				}
 				else {
-					DPortKRUp = 60;
+					gDPortKRUp = 60;
 				//	leds.setPixel(DPortStartLED + DPortIndex, colorbg);
 
 				}
 				DPPortLEDMillis = millis();
 			}
-
 		}
 	
 	FadeLEDs(DPortStartLED, DPortStartLED + numDPortLEDs , 25);
@@ -616,7 +615,7 @@ void DPortKnightRider(uint32_t colorfg, uint32_t colorbg, uint16_t wait)
 void DPortShortCircuit() {
 	byte pixnum;
 	byte i;
-	if (millis() - DPPortLEDMillis > DPortIndex) {
+	if (millis() - DPPortLEDMillis > gDPortIndex) {
 		// Select a random number of pixels for color 1
 		pixnum = random(1, 2);
 		for (i = 0; i < pixnum; i++) {
@@ -633,42 +632,73 @@ void DPortShortCircuit() {
 		for (i = 0; i < pixnum; i++) {
 			leds.setPixel(DPortStartLED + random(0, numDPortLEDs - 1), 0xCC0000);
 		}
-		DPortIndex = DPortIndex + 2;
+		gDPortIndex = gDPortIndex + 2;
 		FadeLEDs(DPortStartLED, DPortStartLED + numDPortLEDs - 1, 80);
 		DPPortLEDMillis = millis();
 	}
 }
 
 void StartDPortCardLED() {
-	DPortIndex = 0;
+	gDPortIndex = 0;
 	gCurrentLEDDPortNumber = 3;
-	DPortKRUp = 0;
+	gDPortKRUp = 0;
 	DPPortLEDMillis = millis();
 }
 
 void DPortCard() {
 	if ((millis() - DPPortLEDMillis) > 25) {
-		if (DPortIndex < 10) {
-			leds.setPixel(DPortStartLED + DPortIndex, 0xFF0000);
-			leds.setPixel(DPortStartLED + numDPortLEDs - DPortIndex, 0xFF0000);
+		if (gDPortIndex < 10) {
+			leds.setPixel(DPortStartLED + gDPortIndex, 0xFF0000);
+			leds.setPixel(DPortStartLED + numDPortLEDs - gDPortIndex, 0xFF0000);
 			//	DPortIndex++;
 			//	DPortKRUp++;
 		}
 
-		if (DPortIndex < 25) {
+		if (gDPortIndex < 25) {
 
-			DPortIndex++;
+			gDPortIndex++;
 		}
 		else
 		{
 			for (byte x = 12; x < numDPortLEDs - 12; x++) {
 				leds.setPixel(DPortStartLED + x, 0xFFFFFFF);
 			}
-			DPortIndex = 0;
+			gDPortIndex = 0;
 
 		}
-		if (DPortKRUp < 220) DPortKRUp++;
+		if (gDPortKRUp < 220) gDPortKRUp++;
 		else gCurrentLEDDPortNumber = 0;
+		FadeLEDs(DPortStartLED, DPortStartLED + numDPortLEDs, 15);
+		DPPortLEDMillis = millis();
+	}
+}
+
+void DPortSiren() {
+	if ((millis() - DPPortLEDMillis) > 25) {
+
+		if (gDPortKRUp == 12) {
+			for (int i = 0; i < 6; i++) {
+				leds.setPixel(DPortStartLED + i, 0xDDDDDD);
+			}
+
+			for (int i = numDPortLEDs - 5; i < numDPortLEDs; i++) {
+				leds.setPixel(DPortStartLED + i, 0x0000FF);
+			}
+
+		}
+		if (gDPortKRUp == 24) {
+			for (int i = 0; i < 6; i++) {
+				leds.setPixel(DPortStartLED + i, 0x0000FF);
+			}
+
+			for (int i = numDPortLEDs - 5; i < numDPortLEDs; i++) {
+				leds.setPixel(DPortStartLED + i, 0xDDDDDD);
+			}
+			gDPortKRUp = 1;
+		}
+		gDPortKRUp++;
+
+
 		FadeLEDs(DPortStartLED, DPortStartLED + numDPortLEDs, 15);
 		DPPortLEDMillis = millis();
 	}
