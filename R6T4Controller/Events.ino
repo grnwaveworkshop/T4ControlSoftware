@@ -149,7 +149,7 @@ void ButtonA1Click() {
 	StopAllServoSequences();
 	VocalAllStop();
 	gAutoPlayWav = 0;
-	//StopBubbles();
+	StopBubbles();
 }
 
 void ButtonA1LongClick() {
@@ -238,7 +238,10 @@ void ButtonB2Click() {
 }
 
 void ButtonB2ClickB() {
-	PieOpenSequencial();
+	//PieOpenSequencial();
+	PieOpenAll();
+	StartBubbles(3000);
+	scheduler.schedule(PieCloseSequencial, 3000);
 }
 
 void ButtonB3Click() {

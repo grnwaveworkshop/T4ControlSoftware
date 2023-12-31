@@ -451,7 +451,7 @@ void PieCloseSequencial() {
 // Close all the Pie Servos sequencially
 void PieOpenClose3(uint16_t NumCycles) {
 	Serial.println("Pie Servo Open Close 3");
-//	PieSetServoSpeed(400);
+//	PieSetServoSpeed(250);
 
 	mysenddata.address = PIESERVOADDRESS;
 	mysenddata.command = 'T';
@@ -532,11 +532,12 @@ void PieClose5() {
 }
 
 // Start Bubbles
-void StartBubbles() {
+void StartBubbles(uint16_t Time) {
 	Serial.println("Start Bubbles");
 	mysenddata.address = PIESERVOADDRESS;
 	mysenddata.command = 'T';
 	mysenddata.Data1 = 7;
+	mysenddata.Data2 = Time;
 
 	DataOut.sendData();
 }
