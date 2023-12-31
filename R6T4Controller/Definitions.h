@@ -59,7 +59,9 @@
 #define BUFFPIXEL 2
 
 // Analog Input Definitions
-#define AUDIN 7
+//#define AUDIN 7	// Analog in 7 for DFPlayer
+#define AUDIN 8	// Analog in 8 for Vocalizer
+
 
 // Servo Time out.  Time to wait to detach servos. 
 #define SERVOTIMEOUT 35
@@ -126,6 +128,8 @@
 //#define UtilityArmBotSwitch 11
 #define DRIVEENABLE 7	// Switch that activates the Dome and drive motors
 #define AUDIOVOLUME 10	// Audio volume control
+#define VOCALVOLUME 13	// Audio volume control
+#define WAVVOLUME 14	// Audio volume control
 #define BUTTONBANK 9	// Switch to change the bank of buttom functions
 #define CDCHANNEL 11	// Switch to activate the card dispenser
 #define AUDIOMODE  8	// Switch to activate Auto Sounds and Dome

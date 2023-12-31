@@ -301,7 +301,7 @@ void ServosAllClosed() {
 	   // Close Data Panel Door
 	DataPanelDoorState = 4;
 	bDataDoorOpen = 0;
-
+	TurnDPLEDsOff();
 
 	// Close Pie Panels
 	PieCloseAll();
@@ -317,6 +317,7 @@ void OpenAllBodyServos() {
 	// Open Data Panel Door
 	DataPanelDoorState = 1;
 	bDataDoorOpen = 1;
+	TurnDPLEDsOn();
 
 	// Open IntArmDoor
 	ServoList[INTARMDOOR].target_position = IntArmdoorOpen;

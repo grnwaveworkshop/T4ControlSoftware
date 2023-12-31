@@ -11,7 +11,7 @@ bool ButtonPressed = false;	// Button Pressed indicator for button bank
 bool ButtonPressedTR = false;	// Button Pressed indicator for Trim Rud
 bool ButtonLongPressed = false;
 bool TetrisMode = false;
-
+bool ScaredOpen = false;
 
 int ButtonCount = 0;	// Counter for Button Bank
 int ButtonCountTR = 0;	// Counter for Trim Rud
@@ -29,7 +29,8 @@ Scheduler scheduler = Scheduler();      //create a scheduler
 void ProcessEventsLoop() {
 	if (millis() - EventMillis > 100) {
 		ProcessButtons();
-		UpdateVolume();
+		//UpdateVolume();
+		//UpdateMasterVolume();
 		EventMillis = millis();
 	}
 	scheduler.update();                 //update the scheduler, maybe it is time to execute a function?
@@ -70,7 +71,7 @@ void ProcessButtons() {
 			ButtonPressed = 0;
 			ButtonLongPressed = 0;
 			ButtonCount = 0;
-			//      Serial.println("Buttons Off");
+			 //     Serial.println("Buttons Off");
 			break;
 			case (CButtonA1 - ButtonDeadband) ... (CButtonA1 + ButtonDeadband) :
 				CheckButtonPress(ButtonA1Click, ButtonA1Click);
@@ -143,9 +144,12 @@ void ProcessButtons() {
 
 
 void ButtonA1Click() {
-	DFPlayer.pause();
+	//DFPlayer.pause();
 	scheduler.stopall();
 	StopAllServoSequences();
+	VocalAllStop();
+	gAutoPlayWav = 0;
+	StopBubbles();
 }
 
 void ButtonA1LongClick() {
@@ -156,79 +160,101 @@ void ButtonA1LongClick() {
 	TurnDPLEDsOff();
 	TurnCPLEDsOff();
 	TurnDPortLEDsOff();
-
+	VocalAllStop();
+	gAutoPlayWav = 0;
 }
 
 void ButtonA2Click() {
-	Serial.println("Button A1 Click");
+	Serial.println("Button A2 Click");
+	gAutoPlayWav = 0;
 	FolderNum = 1;
-	CurrentTrack = random(1, NumTracksFolder[FolderNum]);
-	DFPlayer.playFolder(FolderNum, CurrentTrack);
+	//CurrentTrack = random(1, NumTracksFolder[FolderNum]);
+	//DFPlayer.playFolder(FolderNum, CurrentTrack);
+	gCurrentWavTrack = random(1, MaxWavTracks + 1);
+	PlayWavA();
 }
 
 void ButtonA2ClickB() {
-	if (CurrentTrack < NumTracksFolder[1]) CurrentTrack++;
-	else CurrentTrack = 1;
-	DFPlayer.playFolder(1, CurrentTrack);
+	//if (CurrentTrack < NumTracksFolder[1]) CurrentTrack++;
+	//else CurrentTrack = 1;
+	//DFPlayer.playFolder(1, CurrentTrack);
+	PlayNextWavA();
 	//DFPlayer.next();
 }
 
 void ButtonA2LongClick() {
 
 	//CurrentTrack = random(1, NumTracksFolder[1]);
-	DFPlayer.loopFolder(1);
+	//DFPlayer.loopFolder(1);
+	gAutoPlayWav = 1;
 }
 
 void ButtonA3Click() {
-	CurrentTrack = random(1, NumTracksFolder[2]);
-	DFPlayer.playFolder(2, CurrentTrack);
+	//CurrentTrack = random(1, NumTracksFolder[2]);
+	//DFPlayer.playFolder(2, CurrentTrack);
+
+	PlayHappy();
 }
 
 void ButtonA3ClickB() {
+	// Play Imperial March
 	CurrentTrack = 2;
-	DFPlayer.playFolder(1, CurrentTrack);
+	//DFPlayer.playFolder(1, CurrentTrack);
+	PlayWavA(2);
 }
 
 void ButtonA4Click() {
-	CurrentTrack = random(1, NumTracksFolder[3]);
-	DFPlayer.playFolder(3, CurrentTrack);
+	//CurrentTrack = random(1, NumTracksFolder[3]);
+	//DFPlayer.playFolder(3, CurrentTrack);
 }
 
 void ButtonA4ClickB() {
 
-	Serial.println(DFPlayer.readState());
-	delay(200);
-	PlayTrackorAdvert(11, 4, 6, 6);
+	//Serial.println(DFPlayer.readState());
+	//delay(200);
+	//PlayTrackorAdvert(11, 4, 6, 6);
+	PlayWavB(2004);
 	//DFPlayer.advertise(6);	// No Thank you
 }
 
 void ButtonB1Click() {
-	CurrentTrack = random(1, NumTracksFolder[4]);
-	DFPlayer.playFolder(4, CurrentTrack);
+	//CurrentTrack = random(1, NumTracksFolder[4]);
+	//DFPlayer.playFolder(4, CurrentTrack);
+	PlayMadMild();
 }
 
 void ButtonB1ClickB() {
-	PieOpenClose3(3);
+	SetPSIMode(8);  //Siren
+	SetDPortLEDMode(4);
+	PlayWavB(3002);
+	HolosBright();
+	LogicShortCircuit();
 }
 
 void ButtonB2Click() {
-	CurrentTrack = random(1, NumTracksFolder[5]);
-	DFPlayer.playFolder(5, CurrentTrack);
+	//CurrentTrack = random(1, NumTracksFolder[5]);
+	//DFPlayer.playFolder(5, CurrentTrack);
+	PlaySadMild();
 }
 
 void ButtonB2ClickB() {
-	PieOpenSequencial();
+	//PieOpenSequencial();
+	PieOpenAll();
+	StartBubbles(3000);
+	scheduler.schedule(PieCloseSequencial, 3000);
 }
 
 void ButtonB3Click() {
-	CurrentTrack = random(1, NumTracksFolder[6]);
-	DFPlayer.playFolder(6, CurrentTrack);
+	//CurrentTrack = random(1, NumTracksFolder[6]);
+	//DFPlayer.playFolder(6, CurrentTrack);
+	PlayScaredMild();
 }
 
 void ButtonB3ClickB() {
 	PieCloseSequencial();
 	CurrentTrack = 16;
-	DFPlayer.playFolder(1, CurrentTrack);
+	//DFPlayer.playFolder(1, CurrentTrack);
+	PlayWavA(16);
 }
 
 void ButtonB4Click() {
@@ -254,18 +280,24 @@ void ButtonB4Click() {
 		CurrentTrack = random(1, 5);
 		DFPlayer.advertise(CurrentTrack);
 	}*/
-	PlayTrackorAdvert(7, 0, 1, 5);
-	PieOpenAll();
-	//scheduler.schedule(PieCloseAll, 1000);
+	if (!ScaredOpen) {
+		ScaredOpen = 1;
+		
+		//PlayTrackorAdvert(7, 0, 1, 5);
+		PieOpenAll();
+		//scheduler.schedule(PieCloseAll, 1000);
 
-	HolosBright();
-	OpenAllBodyServos();  // Open all servo doors
-	//scheduler.schedule(ServosAllClosed, 1000);
+		HolosBright();
+		OpenAllBodyServos();  // Open all servo doors
+		//scheduler.schedule(ServosAllClosed, 1000);
+		PlayScaredExtreme();
+	}
 }
 
 void ButtonB4ClickB() {
-	CurrentTrack = random(1, NumTracksFolder[12]);
-	DFPlayer.playFolder(12, CurrentTrack);
+	PlayElectrocute();
+	//CurrentTrack = random(1, NumTracksFolder[12]);
+	//DFPlayer.playFolder(12, CurrentTrack);
 	SetPSIMode(2); // PSI Short Circuit
 	SetDPortLEDMode(2);
 	scheduler.schedule(HolosBright, 40);
@@ -306,15 +338,18 @@ void ButtonB4ClickB() {
 void ButtonB4LongClick() {
 	// Scream function
 	Serial.println("Button B4 Long Click");
-	ServosAllClosed();
-	AllDomeLEDsOn();
-
+	if (ScaredOpen) {
+		ServosAllClosed();
+		AllDomeLEDsOn();
+		ScaredOpen = 0;
+	}
 }
 
 
 void ButtonC1Click() {
 	// PSIFrontOff();
 	SmokeOff();
+	PlayMadExtreme();
 
 }
 
@@ -332,29 +367,40 @@ void ButtonC2Click() {
 	if (TetrisMode) TetrisRotate();
 	else {
 		
-		CurrentTrack = random(1, NumTracksFolder[8]);
-		DFPlayer.playFolder(8, CurrentTrack);
+		//CurrentTrack = random(1, NumTracksFolder[8]);
+		//DFPlayer.playFolder(8, CurrentTrack);
+		PlaySadExtreme();
 	}
 }
 
 void ButtonC2ClickB() {
-	LogicTwinkleRed();
+	//LogicTwinkleRed(); 
+	LogicNextPattern();
+	LogicNextPatternDelay(15000);
 }
 
 void ButtonC3Click() {
 	
-	CurrentTrack = random(1, NumTracksFolder[9]);
-	DFPlayer.playFolder(9, CurrentTrack);
+	//CurrentTrack = random(1, NumTracksFolder[9]);
+	//DFPlayer.playFolder(9, CurrentTrack);
+	PieOpenClose3(3);
+
 }
 
 void ButtonC3ClickB() {
 	CurrentTrack = 5;
-	DFPlayer.playFolder(1, CurrentTrack);
+	//DFPlayer.playFolder(1, CurrentTrack);
+	PlayWavA(CurrentTrack);
 }
 
 void ButtonC4Click() {
-	CurrentTrack = random(1, NumTracksFolder[10]);
-	DFPlayer.playFolder(10, CurrentTrack);
+//	CurrentTrack = random(1, NumTracksFolder[10]);
+//	DFPlayer.playFolder(10, CurrentTrack);
+	if (ScaredOpen) {
+		ServosAllClosed();
+		AllDomeLEDsOn();
+		ScaredOpen = 0;
+	}
 }
 
 void ButtonC4LongClick() {
@@ -362,9 +408,24 @@ void ButtonC4LongClick() {
 }
 
 void ButtonC4ClickB() {
-	//Logic Next Pattern
-	LogicNextPattern();
-	LogicNextPatternDelay(15000);
+	//Scream and I feel good
+	VocalAllStop();
+	if (!ScaredOpen) {
+		ScaredOpen = 1;
+
+		//PlayTrackorAdvert(7, 0, 1, 5);
+		PieOpenAll();
+		//scheduler.schedule(PieCloseAll, 1000);
+
+		HolosBright();
+		OpenAllBodyServos();  // Open all servo doors
+		//scheduler.schedule(ServosAllClosed, 1000);
+		PlayScaredExtreme();
+	}
+	// play feel good song
+	gCurrentWavTrack = 7;
+	scheduler.schedule(PlayWavA, 1650);
+	
 }
 
 void ButtonD1Click() {
@@ -387,7 +448,11 @@ void ButtonD1Click() {
 	}
 }
 void ButtonD1ClickB() {
-	SetPSIMode(6);  //Radar
+	SetPSIMode(8);  //Siren
+	SetDPortLEDMode(4);
+	PlayWavB(3001);
+	HolosBright();
+	LogicShortCircuit();
 }
 
 void ButtonD1LongClick() {
@@ -429,12 +494,13 @@ void ButtonD3Click() {
 
 void ButtonD3ClickB() {
 	//Toggle Red Light Green Light on PSI
-	if (GetPSIMode() == 3) SetPSIMode(4);
-	else if (GetPSIMode() == 4) SetPSIMode(3);
+	if (GetPSIMode() == 3) { SetPSIMode(4); PlayHappyMild(); }
+	else if (GetPSIMode() == 4) { SetPSIMode(3); PlayMadMild(); }
 	if (GetPSIMode() > 4 || GetPSIMode() < 3) {
 		SetPSIMode(3);
-		CurrentTrack = random(1, NumTracksFolder[3]);
-		DFPlayer.playFolder(3, CurrentTrack);
+		//CurrentTrack = random(1, NumTracksFolder[3]);
+		//DFPlayer.playFolder(3, CurrentTrack);
+		PlayMadExtreme();
 	}
 }
 
@@ -462,11 +528,13 @@ void ButtonD4LongClick() {
 		LogicNextPatternDelay(25000);
 		SetPSIMode(1);
 		Serial.println("Tetris Mode Off");
-		DFPlayer.playFolder(11, 3);
+		//DFPlayer.playFolder(11, 3);
+		PlayWavA(2003);
 	}
 	else {
 		TetrisMode = true;
-		DFPlayer.playFolder(11, 1);
+		//DFPlayer.playFolder(11, 1);
+		PlayWavA(2001);
 		TetrisStart();
 		Serial.println("Tetris Mode ON");
 		SetPSIMode(0);
