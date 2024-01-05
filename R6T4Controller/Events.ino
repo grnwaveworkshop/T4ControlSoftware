@@ -29,8 +29,8 @@ Scheduler scheduler = Scheduler();      //create a scheduler
 void ProcessEventsLoop() {
 	if (millis() - EventMillis > 100) {
 		ProcessButtons();
-		//UpdateVolume();
-		//UpdateMasterVolume();
+		UpdateVolume();
+		UpdateMasterVolume();
 		EventMillis = millis();
 	}
 	scheduler.update();                 //update the scheduler, maybe it is time to execute a function?

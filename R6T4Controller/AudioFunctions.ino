@@ -121,7 +121,7 @@ void DecVolume() {
 void UpdateVolume() {
 	if (CurrentAudioVolume != ChannelData(AUDIOVOLUME) / 60) {
 		CurrentAudioVolume = ChannelData(AUDIOVOLUME) / 60;
-		DFPlayer.volume(CurrentAudioVolume);
+		//DFPlayer.volume(CurrentAudioVolume);
 		Serial.print("AudioVolume: ");
 		Serial.println(CurrentAudioVolume);
 		tft.setTextColor(ST7735_WHITE, ST7735_BLACK);
