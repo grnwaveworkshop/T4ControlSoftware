@@ -92,6 +92,7 @@ void ProcessButtons() {
 					break;
 				case (CButtonB2 - ButtonDeadband) ... (CButtonB2 + ButtonDeadband) :
 					CheckButtonPress(ButtonB2Click, ButtonB2ClickB);
+					CheckLongPress(ButtonB2LongClick, 0);
 					break;
 				case (CButtonB3 - ButtonDeadband) ... (CButtonB3 + ButtonDeadband) :
 					CheckButtonPress(ButtonB3Click, ButtonB3ClickB);
@@ -240,9 +241,17 @@ void ButtonB2Click() {
 void ButtonB2ClickB() {
 	//PieOpenSequencial();
 	PieOpenAll();
-	StartBubbles(3000);
+	StartBubbles(5000);
 	scheduler.schedule(PieCloseSequencial, 3000);
 }
+
+void ButtonB2LongClick() {
+	//PieOpenSequencial();
+	PieOpenAll();
+	StartBubbles(15000);
+	//scheduler.schedule(PieCloseSequencial, 3000);
+}
+
 
 void ButtonB3Click() {
 	//CurrentTrack = random(1, NumTracksFolder[6]);
@@ -377,6 +386,8 @@ void ButtonC2ClickB() {
 	//LogicTwinkleRed(); 
 	LogicNextPattern();
 	LogicNextPatternDelay(15000);
+	StopBubbles();
+	PieCloseAll();
 }
 
 void ButtonC3Click() {
