@@ -1,0 +1,4 @@
+#ifndef CHARGEPANELLED_HPP
+#define CHARGEPANELLED_HPP
+
+#endif
